@@ -1,5 +1,4 @@
-import { h } from 'preact'
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { Store } from '../store/prefs'
 import { getGameStatus } from '../store/state'
 import { liveSay, isTypingInTextField } from '../utils/a11y'
@@ -15,7 +14,7 @@ type Props = { store: Store, liveRegionId: string }
 
 export function RootOverlay({ store, liveRegionId }: Props) {
   const [status, setStatus] = useState(() => getGameStatus(store))
-  const [attached, setAttached] = useState(false)
+  const [attached, setAttached] = useState(() => !!store.getState().discovery.board)
   const overlayRef = useRef<HTMLDivElement>(null)
   const lastBoard = useRef<("X"|"O"|null)[]>(status.board)
 
@@ -27,7 +26,7 @@ export function RootOverlay({ store, liveRegionId }: Props) {
     })
     setAttached(!!store.getState().discovery.board)
     return () => unsub()
-  }, [])
+  }, [store])
 
   // Announce status changes
   useEffect(() => {
@@ -56,7 +55,7 @@ export function RootOverlay({ store, liveRegionId }: Props) {
     } else {
       liveSay(liveRegionId, `${status.next}'s turn`)
     }
-  }, [status.winner, status.draw, status.board, status.next])
+  }, [liveRegionId, status.board, status.draw, status.next, status.winner, store])
 
   // Keyboard shortcuts listener (non-invasive)
   useEffect(() => {
@@ -68,28 +67,34 @@ export function RootOverlay({ store, liveRegionId }: Props) {
       // Arrow hinting: focus next cell if none focused
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
         const cells = store.getState().discovery.cells || []
-        const active = document.activeElement
-        if (!cells.includes(active as any) && cells[0]) cells[0].focus?.()
+        const active = document.activeElement as HTMLElement | null
+        if (!cells.includes(active as HTMLElement) && cells[0]) cells[0].focus?.()
       }
     }
-    window.addEventListener('keydown', onKey, { capture: true })
-    return () => window.removeEventListener('keydown', onKey, { capture: true } as any)
-  }, [])
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [store])
 
   // Maintain overlay position relative to board
+  const boardElement = store.getState().discovery.board
   const style = useMemo(() => {
-    const b = store.getState().discovery.board
-    if (!b) return { display: 'none' } as any
-    const r = b.getBoundingClientRect()
-    return { position: 'fixed', left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` }
-  }, [store.getState().discovery.board, status.board])
+    if (!boardElement) return { display: 'none' } as const
+    const r = boardElement.getBoundingClientRect()
+    return {
+      position: 'fixed' as const,
+      left: `${r.left}px`,
+      top: `${r.top}px`,
+      width: `${r.width}px`,
+      height: `${r.height}px`,
+    }
+  }, [boardElement, status.board])
 
   return (
     <div class="ttt-enhancer">
       {!attached && (
         <div class="ttt-toast" style="position:fixed; right:12px; bottom:12px; pointer-events:none;">UI Enhancer idle—app not detected.</div>
       )}
-      <div ref={overlayRef} class="ttt-overlay" style={style as any} aria-hidden="true">
+      <div ref={overlayRef} class="ttt-overlay" style={style as Record<string, string>} aria-hidden="true">
         <GridDecoration store={store} statusKey={`${status.board.join('')}-${status.winLine?.join('-') || 'none'}`} />
       </div>
       <Settings store={store} />
@@ -103,89 +108,118 @@ export function RootOverlay({ store, liveRegionId }: Props) {
 function GridDecoration({ store, statusKey }: { store: Store, statusKey: string }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const cells = store.getState().discovery.cells || []
 
-  useEffect(() => {
-    draw()
-    const ro = new ResizeObserver(draw)
-    const root = canvasRef.current?.parentElement
-    if (root) ro.observe(root)
-    return () => ro.disconnect()
-  }, [statusKey])
-
-  useEffect(() => {
-    const c = store.getState().discovery.cells || []
-    const enter = (i: number) => () => setHoverIdx(i)
-    const leave = () => setHoverIdx(null)
-    c.forEach((el, i) => { el.addEventListener('mouseenter', enter(i)); el.addEventListener('mouseleave', leave); el.addEventListener('focus', enter(i)); el.addEventListener('blur', leave) })
-    return () => c.forEach((el, i) => { el.removeEventListener('mouseenter', enter(i)); el.removeEventListener('mouseleave', leave); el.removeEventListener('focus', enter(i)); el.removeEventListener('blur', leave) })
-  }, [store.getState().discovery.cells])
-
-  function draw() {
+  const draw = useCallback(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
-    const parent = canvas.parentElement as HTMLElement
+    const parent = canvas?.parentElement as HTMLElement | null
+    if (!canvas || !parent) return
+
     canvas.width = parent.clientWidth
     canvas.height = parent.clientHeight
-    const ctx = canvas.getContext('2d')!
-    ctx.clearRect(0,0,canvas.width,canvas.height)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // draw crisp grid
-    const w = canvas.width, h = canvas.height
+    const w = canvas.width
+    const h = canvas.height
     const cs = Math.min(w, h) / 3
-    const ox = (w - cs*3) / 2
-    const oy = (h - cs*3) / 2
+    const ox = (w - cs * 3) / 2
+    const oy = (h - cs * 3) / 2
     ctx.strokeStyle = 'rgba(255,255,255,0.18)'
     ctx.lineWidth = 2
-    for (let i=1;i<3;i++) {
-      const x = Math.round(ox + cs*i) + 0.5
-      const y = Math.round(oy + cs*i) + 0.5
-      ctx.beginPath(); ctx.moveTo(x, oy); ctx.lineTo(x, oy + cs*3); ctx.stroke()
-      ctx.beginPath(); ctx.moveTo(ox, y); ctx.lineTo(ox + cs*3, y); ctx.stroke()
+    for (let i = 1; i < 3; i++) {
+      const x = Math.round(ox + cs * i) + 0.5
+      const y = Math.round(oy + cs * i) + 0.5
+      ctx.beginPath()
+      ctx.moveTo(x, oy)
+      ctx.lineTo(x, oy + cs * 3)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(ox, y)
+      ctx.lineTo(ox + cs * 3, y)
+      ctx.stroke()
     }
 
-    // winning line
     const status = getGameStatus(store)
     if (status.winLine) {
       ctx.strokeStyle = getComputedStyle(document.querySelector('.ttt-enhancer-root') || document.body).getPropertyValue('--color-win').trim() || '#30d158'
       ctx.lineWidth = 6
       ctx.lineCap = 'round'
-      const [a,b,c] = status.winLine
-      const p = (i: number) => ({
-        x: ox + cs*(i%3) + cs/2,
-        y: oy + cs*Math.floor(i/3) + cs/2,
+      const [a, , c] = status.winLine
+      const point = (index: number) => ({
+        x: ox + cs * (index % 3) + cs / 2,
+        y: oy + cs * Math.floor(index / 3) + cs / 2,
       })
-      const p0 = p(a), p1 = p(c)
-      animateLine(ctx, p0.x, p0.y, p1.x, p1.y)
+      const start = point(a)
+      const end = point(c)
+      animateLine(ctx, start.x, start.y, end.x, end.y)
     }
 
-    // ghost mark
     const prefs = store.getState().prefs
     if (prefs.ghostMarks && hoverIdx != null) {
       const status = getGameStatus(store)
-      const i = hoverIdx
-      const cx = ox + cs*(i%3) + cs/2
-      const cy = oy + cs*Math.floor(i/3) + cs/2
-      // focus ring around the hovered/focused cell
+      const index = hoverIdx
+      const cx = ox + cs * (index % 3) + cs / 2
+      const cy = oy + cs * Math.floor(index / 3) + cs / 2
       ctx.save()
       ctx.strokeStyle = 'rgba(106,169,255,0.75)'
       ctx.lineWidth = 2
-      ctx.setLineDash([6,4])
-      ctx.strokeRect(ox + cs*(i%3) + 6, oy + cs*Math.floor(i/3) + 6, cs - 12, cs - 12)
+      ctx.setLineDash([6, 4])
+      ctx.strokeRect(ox + cs * (index % 3) + 6, oy + cs * Math.floor(index / 3) + 6, cs - 12, cs - 12)
       ctx.restore()
       ctx.save()
       ctx.globalAlpha = 0.35
       ctx.strokeStyle = getComputedStyle(document.querySelector('.ttt-enhancer-root') || document.body).getPropertyValue('--color-accent').trim() || '#6aa9ff'
       ctx.lineWidth = 3
       if (status.next === 'X') {
-        const s = cs*0.28
-        ctx.beginPath(); ctx.moveTo(cx - s, cy - s); ctx.lineTo(cx + s, cy + s); ctx.stroke()
-        ctx.beginPath(); ctx.moveTo(cx + s, cy - s); ctx.lineTo(cx - s, cy + s); ctx.stroke()
+        const size = cs * 0.28
+        ctx.beginPath()
+        ctx.moveTo(cx - size, cy - size)
+        ctx.lineTo(cx + size, cy + size)
+        ctx.stroke()
+        ctx.beginPath()
+        ctx.moveTo(cx + size, cy - size)
+        ctx.lineTo(cx - size, cy + size)
+        ctx.stroke()
       } else {
-        ctx.beginPath(); ctx.arc(cx, cy, cs*0.32, 0, Math.PI*2); ctx.stroke()
+        ctx.beginPath()
+        ctx.arc(cx, cy, cs * 0.32, 0, Math.PI * 2)
+        ctx.stroke()
       }
       ctx.restore()
     }
-  }
+  }, [hoverIdx, statusKey, store])
+
+  useEffect(() => {
+    draw()
+    const ro = new ResizeObserver(draw)
+    const parent = canvasRef.current?.parentElement
+    if (parent) ro.observe(parent)
+    return () => ro.disconnect()
+  }, [draw])
+
+  useEffect(() => {
+    if (!cells.length) return undefined
+    const leave = () => setHoverIdx(null)
+    const enterHandlers = cells.map((_, i) => () => setHoverIdx(i))
+    cells.forEach((el, i) => {
+      const enter = enterHandlers[i]
+      el.addEventListener('mouseenter', enter)
+      el.addEventListener('focus', enter)
+      el.addEventListener('mouseleave', leave)
+      el.addEventListener('blur', leave)
+    })
+    return () => {
+      cells.forEach((el, i) => {
+        const enter = enterHandlers[i]
+        el.removeEventListener('mouseenter', enter)
+        el.removeEventListener('focus', enter)
+        el.removeEventListener('mouseleave', leave)
+        el.removeEventListener('blur', leave)
+      })
+    }
+  }, [cells])
 
   return <canvas ref={canvasRef} class="ttt-canvas" aria-hidden="true"></canvas>
 }

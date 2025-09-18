@@ -6,12 +6,20 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tailwindcss from 'eslint-plugin-tailwindcss';
+import globals from 'globals';
 
 const tsFiles = ['**/*.ts', '**/*.tsx'];
 
 export default [
   {
     ignores: ['**/dist/**', '**/build/**', '**/.turbo/**', '**/node_modules/**'],
+  },
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
   },
   js.configs.recommended,
   {
@@ -68,6 +76,7 @@ export default [
       ...jsxA11y.configs.recommended.rules,
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
+      'react/no-unknown-property': ['error', { ignore: ['class'] }],
       'tailwindcss/classnames-order': 'error',
       'tailwindcss/no-custom-classname': 'off',
     },

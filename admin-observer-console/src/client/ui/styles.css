@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn { @apply px-3 py-2 rounded bg-primary text-white hover:opacity-90 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary; }
+.input { @apply px-3 py-2 rounded bg-slate-800 border border-slate-600 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary; }
+.card { @apply rounded border border-slate-700 p-4 bg-slate-900/40; }
+

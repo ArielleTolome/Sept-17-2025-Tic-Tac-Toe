@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  admin-console:
+    build: .
+    ports:
+      - '4800:4800'
+    environment:
+      - PORT=4800
+      - MOCK=1
+      - ALLOWED_ORIGIN=http://localhost:5179
+    restart: unless-stopped
+

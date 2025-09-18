@@ -19,6 +19,7 @@
     "preact": "10.23.2"
   },
   "devDependencies": {
+    "@eslint/js": "8.57.1",
     "@playwright/test": "1.48.2",
     "@preact/preset-vite": "2.9.1",
     "@types/node": "22.7.5",
@@ -27,7 +28,13 @@
     "jsdom": "25.0.1",
     "axe-core": "4.10.0",
     "autoprefixer": "10.4.20",
-    "eslint": "9.11.1",
+    "eslint": "8.57.1",
+    "eslint-plugin-jsx-a11y": "6.9.0",
+    "eslint-plugin-react": "7.37.1",
+    "eslint-plugin-react-hooks": "5.0.0-canary-7118f5dd7-20230705",
+    "eslint-plugin-simple-import-sort": "12.1.0",
+    "eslint-plugin-tailwindcss": "3.17.5",
+    "globals": "15.9.0",
     "eslint-plugin-n": "17.10.3",
     "postcss": "8.4.47",
     "prettier": "3.3.3",

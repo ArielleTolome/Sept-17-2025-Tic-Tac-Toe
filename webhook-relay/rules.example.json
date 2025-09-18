@@ -1,0 +1,9 @@
+{
+  "rules": [
+    { "event": "start", "channels": ["slack", "discord"], "template": "Game started: {{roomId}}" },
+    { "event": "turn", "channels": ["slack"], "template": "Turn: {{player}} in {{roomId}}" },
+    { "event": "win", "channels": ["slack", "email", "sms"], "template": "Winner: {{winner}} in {{roomId}}" },
+    { "event": "draw", "channels": ["slack"], "template": "Draw in {{roomId}}" }
+  ]
+}
+

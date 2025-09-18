@@ -1,4 +1,4 @@
-import { Discovery } from '../dom/discovery'
+import type { Discovery } from '../dom/discovery'
 
 export type Preferences = {
   theme: 'light'|'dark'|'high-contrast'|'protanopia'|'deuteranopia'|'tritanopia'
@@ -50,7 +50,9 @@ export function initPreferences(): State {
   const stored = storage.getItem(KEY)
   const base: State = {
     prefs: {
-      theme: 'dark', fontScale: 1, reduceMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      theme: 'dark',
+      fontScale: 1,
+      reduceMotion: typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)').matches : false,
       ghostMarks: true, sounds: false, volume: 0.3, haptics: false, tooltips: true, tipsOnStart: true, dyslexiaFont: false
     },
     discovery: { board: null, cells: [], outcome: null, debug: { candidates: [], chosen: null } },
@@ -72,7 +74,9 @@ export function createStore(initial: State): Store {
   const api: Store = {
     getState: () => state,
     setState: (p) => {
-      state = { ...state, ...p, prefs: { ...state.prefs, ...(p as any).prefs } }
+      const { prefs: incomingPrefs, ...rest } = p
+      const nextPrefs = incomingPrefs ? { ...state.prefs, ...incomingPrefs } : state.prefs
+      state = { ...state, ...rest, prefs: nextPrefs }
       persist(state.prefs)
       subs.forEach(fn => safeCall(() => fn(state)))
     },
@@ -90,7 +94,6 @@ export function persist(prefs: Preferences) {
 }
 
 function applyTokens(prefs: Preferences) {
-  const root = document.documentElement
   const enhancerRoot = document.querySelector('.ttt-enhancer-root') as HTMLElement | null
   const classList = enhancerRoot?.classList
   if (!classList) return
@@ -100,4 +103,10 @@ function applyTokens(prefs: Preferences) {
   enhancerRoot!.style.setProperty('--font-scale', String(prefs.fontScale))
 }
 
-function safeCall(fn: () => void) { try { fn() } catch {} }
+function safeCall(fn: () => void) {
+  try {
+    fn()
+  } catch (err) {
+    /* intentionally ignore subscriber errors */
+  }
+}

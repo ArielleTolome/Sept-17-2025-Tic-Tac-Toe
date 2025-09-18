@@ -56,10 +56,26 @@ export function attachEnhancer() {
 
   // Cleanup on page hide (not strictly needed, extension disable unloads page)
   window.addEventListener('pagehide', () => {
-    try { unobserve() } catch {}
-    try { render(null, root) } catch {}
-    try { root.remove() } catch {}
-    try { live.remove() } catch {}
+    try {
+      unobserve()
+    } catch (err) {
+      /* ignore cleanup chain failures */
+    }
+    try {
+      render(null, root)
+    } catch (err) {
+      /* ignore cleanup chain failures */
+    }
+    try {
+      root.remove()
+    } catch (err) {
+      /* ignore cleanup chain failures */
+    }
+    try {
+      live.remove()
+    } catch (err) {
+      /* ignore cleanup chain failures */
+    }
     mounted = false
   })
 }

@@ -3,7 +3,18 @@ export function observeDom(onChange: () => void) {
   mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true })
   const ro = new ResizeObserver(() => onChange())
   ro.observe(document.documentElement)
-  const cleanup = () => { try { mo.disconnect() } catch {} try { ro.disconnect() } catch {} }
+  const cleanup = () => {
+    try {
+      mo.disconnect()
+    } catch (err) {
+      /* observer already disposed */
+    }
+    try {
+      ro.disconnect()
+    } catch (err) {
+      /* observer already disposed */
+    }
+  }
   window.addEventListener('hashchange', onChange)
   window.addEventListener('popstate', onChange)
   return () => {

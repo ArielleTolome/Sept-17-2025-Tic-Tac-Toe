@@ -1,0 +1,25 @@
+version: '3.9'
+services:
+  relay:
+    build: .
+    ports:
+      - '4700:4700'
+    environment:
+      - PORT=4700
+      - WS_BASE_URL=ws://localhost:8080/ws
+      - RULES_PATH=/app/rules.json
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_FROM=${TWILIO_FROM}
+      - TWILIO_TO=${TWILIO_TO}
+    volumes:
+      - ./rules.example.json:/app/rules.json:ro
+    restart: unless-stopped
+

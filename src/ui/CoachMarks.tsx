@@ -1,9 +1,8 @@
-import { h } from 'preact'
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { Store } from '../store/prefs'
 import { Arrow, Close } from './Icons'
 
-type Step = { key: string, title: string, body: string, anchor?: Element | null }
+type Step = { key: string; title: string; body: string; anchor?: HTMLElement | null }
 
 const KEY = 'ttt-ui-enhancer:coach-dismissed'
 
@@ -15,43 +14,54 @@ export function CoachMarks({ store }: { store: Store }) {
 
   const { prefs, discovery } = store.getState()
 
-  const steps: Step[] = [
-    { key: 'board', title: 'Game Board', body: 'Overlay adds focus rings, previews, and winning animations.', anchor: discovery.board || undefined },
-    { key: 'new', title: 'New Game', body: 'Use the host app’s new game button to restart. We never replace controls.', anchor: document.querySelector('[data-new], .new-game, button') || undefined },
-    { key: 'outcome', title: 'Outcome', body: 'Wins show an animated line and optional confetti.', anchor: discovery.outcome || discovery.board || undefined }
-  ]
+  const steps = useMemo<Step[]>(() => {
+    const newGameAnchor = findHostElement(['[data-new]', '.new-game', 'button'])
+    return [
+      { key: 'board', title: 'Game Board', body: 'Overlay adds focus rings, previews, and winning animations.', anchor: discovery.board || undefined },
+      { key: 'new', title: 'New Game', body: 'Use the host app’s new game button to restart. We never replace controls.', anchor: newGameAnchor || undefined },
+      { key: 'outcome', title: 'Outcome', body: 'Wins show an animated line and optional confetti.', anchor: discovery.outcome || discovery.board || undefined },
+    ]
+  }, [discovery.board, discovery.outcome])
 
   useEffect(() => {
     if (!prefs.tipsOnStart) return
     if (localStorage.getItem(KEY) === '1') return
-    const t = setTimeout(() => setOpen(true), 800)
-    return () => clearTimeout(t)
+    const timer = window.setTimeout(() => setOpen(true), 800)
+    return () => window.clearTimeout(timer)
   }, [prefs.tipsOnStart])
+
+  const place = useCallback(() => {
+    if (!open) return
+    const current = steps[idx]
+    if (!current?.anchor) return
+    const rect = current.anchor.getBoundingClientRect()
+    const highlightEl = highlight.current
+    const panelEl = panel.current
+    if (!highlightEl || !panelEl) return
+
+    highlightEl.style.left = `${rect.left - 6}px`
+    highlightEl.style.top = `${rect.top - 6}px`
+    highlightEl.style.width = `${rect.width + 12}px`
+    highlightEl.style.height = `${rect.height + 12}px`
+
+    const px = Math.min(window.innerWidth - panelEl.offsetWidth - 12, Math.max(12, rect.left + rect.width + 10))
+    const py = Math.min(window.innerHeight - panelEl.offsetHeight - 12, Math.max(12, rect.top))
+    panelEl.style.left = `${px}px`
+    panelEl.style.top = `${py}px`
+  }, [idx, open, steps])
 
   useEffect(() => {
     if (!open) return
     place()
-    const ro = new ResizeObserver(place)
-    ro.observe(document.documentElement)
-    return () => ro.disconnect()
-  }, [open, idx, discovery.board])
-
-  function place() {
-    const s = steps[idx]
-    const r = s.anchor?.getBoundingClientRect()
-    if (!r) return
-    const h = highlight.current!
-    h.style.left = `${r.left - 6}px`
-    h.style.top = `${r.top - 6}px`
-    h.style.width = `${r.width + 12}px`
-    h.style.height = `${r.height + 12}px`
-
-    const p = panel.current!
-    const px = Math.min(window.innerWidth - p.offsetWidth - 12, Math.max(12, r.left + r.width + 10))
-    const py = Math.min(window.innerHeight - p.offsetHeight - 12, Math.max(12, r.top))
-    p.style.left = `${px}px`
-    p.style.top = `${py}px`
-  }
+    const anchor = steps[idx]?.anchor || document.documentElement
+    const ro = new ResizeObserver(() => place())
+    if (anchor) ro.observe(anchor)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [idx, open, place, steps])
 
   function next() { setIdx(i => Math.min(i+1, steps.length-1)) }
   function prev() { setIdx(i => Math.max(i-1, 0)) }
@@ -83,3 +93,12 @@ export function CoachMarks({ store }: { store: Store }) {
   )
 }
 
+function findHostElement(selectors: string[]): HTMLElement | null {
+  for (const selector of selectors) {
+    const nodes = document.querySelectorAll<HTMLElement>(selector)
+    for (const node of nodes) {
+      if (!node.closest('.ttt-enhancer')) return node
+    }
+  }
+  return null
+}

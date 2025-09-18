@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  renderer:
+    build: .
+    ports:
+      - '4900:4900'
+    environment:
+      - PORT=4900
+      - API_BASE_URL=http://localhost:8080
+      - ALLOWED_ORIGIN=http://localhost:5173
+      - MOCK=1
+    restart: unless-stopped
+

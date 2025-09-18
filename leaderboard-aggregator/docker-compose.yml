@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  leaderboard:
+    build: .
+    ports:
+      - '4600:4600'
+    environment:
+      - PORT=4600
+      - API_BASE_URL=http://localhost:8080
+      - DATABASE_URL=sqlite:/app/data/leaderboard.sqlite
+      - ALLOWED_ORIGIN=http://localhost:5178
+      - MOCK=1
+      - POLL_INTERVAL_MS=60000
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
