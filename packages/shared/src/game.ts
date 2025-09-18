@@ -1,4 +1,4 @@
-import { BOARD_SIZE, PLAYER_MARKS, WINNING_LINES } from './constants';
+import { BOARD_SIZE, PLAYER_MARKS, WINNING_LINES } from './constants.js';
 import type {
   Board,
   CellValue,
@@ -7,7 +7,7 @@ import type {
   MoveRecord,
   PlayerMark,
   WinningLine,
-} from './types';
+} from './types.js';
 
 export const createEmptyBoard = (): CellValue[] => Array<CellValue>(BOARD_SIZE).fill(null);
 

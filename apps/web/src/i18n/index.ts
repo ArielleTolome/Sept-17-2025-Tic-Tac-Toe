@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import { en, type Translation } from './en';
 
 type Replacements = Record<string, string | number>;

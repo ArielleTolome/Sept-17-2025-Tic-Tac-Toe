@@ -1,4 +1,4 @@
-import type { Difficulty, GameMode } from './constants';
+import type { Difficulty, GameMode } from './constants.js';
 
 export type PlayerMark = 'X' | 'O';
 export type CellValue = PlayerMark | null;
