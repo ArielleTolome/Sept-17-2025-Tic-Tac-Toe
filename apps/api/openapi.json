@@ -1,0 +1,431 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Tic-Tac-Toe API",
+    "version": "1.0.0",
+    "description": "REST and WebSocket API for the Tic-Tac-Toe multiplayer service"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    { "name": "system" },
+    { "name": "rooms" },
+    { "name": "games" },
+    { "name": "leaderboard" }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Health check",
+        "tags": ["system"],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "time": { "type": "string", "format": "date-time" }
+                  },
+                  "required": ["status", "time"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rooms": {
+      "post": {
+        "summary": "Create a multiplayer room",
+        "tags": ["rooms"],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DisplayName" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Room successfully created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateRoomResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid payload",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/rooms/{roomId}/join": {
+      "post": {
+        "summary": "Join an existing room",
+        "tags": ["rooms"],
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Identifier returned when the room was created"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/DisplayName" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Joined the room",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/JoinRoomResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Room not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{id}": {
+      "get": {
+        "summary": "Retrieve a persisted game state",
+        "tags": ["games"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Game snapshot",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GameState" }
+              }
+            }
+          },
+          "404": {
+            "description": "Game not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/leaderboard": {
+      "get": {
+        "summary": "Leaderboard entries",
+        "tags": ["leaderboard"],
+        "responses": {
+          "200": {
+            "description": "Top win rates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/LeaderboardEntry" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DisplayName": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 32,
+            "description": "Optional display name used in presence and chat"
+          }
+        }
+      },
+      "CreateRoomResponse": {
+        "type": "object",
+        "required": ["roomId", "wsUrl", "token"],
+        "properties": {
+          "roomId": { "type": "string", "example": "AbCdEf1234" },
+          "wsUrl": { "type": "string", "format": "uri", "example": "http://localhost:4000" },
+          "token": { "type": "string", "description": "JWT token for authenticating the socket" }
+        }
+      },
+      "JoinRoomResponse": {
+        "type": "object",
+        "required": ["token"],
+        "properties": {
+          "token": { "type": "string", "description": "JWT token for authenticating the socket" }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      },
+      "PlayerMark": {
+        "type": "string",
+        "enum": ["X", "O"]
+      },
+      "CellValue": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/PlayerMark" },
+          { "type": "null" }
+        ]
+      },
+      "Board": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/CellValue" },
+        "minItems": 9,
+        "maxItems": 9
+      },
+      "MoveRecord": {
+        "type": "object",
+        "required": ["order", "index", "player", "timestamp"],
+        "properties": {
+          "order": { "type": "integer", "minimum": 0 },
+          "index": { "type": "integer", "minimum": -1, "maximum": 8 },
+          "player": { "$ref": "#/components/schemas/PlayerMark" },
+          "timestamp": { "type": "integer", "description": "Unix epoch timestamp" }
+        }
+      },
+      "WinningLine": {
+        "type": "object",
+        "required": ["cells", "player"],
+        "properties": {
+          "cells": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 0, "maximum": 8 },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "player": { "$ref": "#/components/schemas/PlayerMark" }
+        }
+      },
+      "ChatMessage": {
+        "type": "object",
+        "required": ["id", "name", "text", "timestamp"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "text": { "type": "string" },
+          "timestamp": { "type": "integer" }
+        }
+      },
+      "PlayerSlot": {
+        "type": "object",
+        "required": ["id", "name", "mark", "isReady"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "mark": { "$ref": "#/components/schemas/PlayerMark" },
+          "isReady": { "type": "boolean" }
+        }
+      },
+      "Spectator": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      },
+      "Timer": {
+        "type": "object",
+        "required": ["remainingMs", "expiresAt"],
+        "properties": {
+          "remainingMs": { "type": "integer" },
+          "expiresAt": { "type": "integer" }
+        }
+      },
+      "GameState": {
+        "type": "object",
+        "required": [
+          "id",
+          "board",
+          "turn",
+          "status",
+          "mode",
+          "winner",
+          "winningLine",
+          "moves",
+          "createdAt",
+          "updatedAt",
+          "chat"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "board": { "$ref": "#/components/schemas/Board" },
+          "turn": { "$ref": "#/components/schemas/PlayerMark" },
+          "status": { "type": "string", "enum": ["pending", "active", "finished"] },
+          "mode": { "type": "string", "enum": ["single", "local", "online"] },
+          "winner": { "oneOf": [{ "$ref": "#/components/schemas/PlayerMark" }, { "type": "null" }] },
+          "winningLine": { "oneOf": [{ "$ref": "#/components/schemas/WinningLine" }, { "type": "null" }] },
+          "moves": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MoveRecord" }
+          },
+          "createdAt": { "type": "integer" },
+          "updatedAt": { "type": "integer" },
+          "chat": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ChatMessage" }
+          },
+          "timer": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/Timer" },
+              { "type": "null" }
+            ]
+          }
+        }
+      },
+      "LeaderboardEntry": {
+        "type": "object",
+        "required": ["userId", "name", "wins", "losses", "draws", "winRate"],
+        "properties": {
+          "userId": { "type": "string" },
+          "name": { "type": "string" },
+          "wins": { "type": "integer", "minimum": 0 },
+          "losses": { "type": "integer", "minimum": 0 },
+          "draws": { "type": "integer", "minimum": 0 },
+          "winRate": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      },
+      "PresenceEvent": {
+        "type": "object",
+        "properties": {
+          "players": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlayerSlot" }
+          },
+          "spectators": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Spectator" }
+          }
+        }
+      },
+      "StateEvent": {
+        "type": "object",
+        "required": ["board", "turn", "players", "spectators", "winner", "line", "moves", "status"],
+        "properties": {
+          "board": { "$ref": "#/components/schemas/Board" },
+          "turn": { "$ref": "#/components/schemas/PlayerMark" },
+          "players": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PlayerSlot" }
+          },
+          "spectators": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Spectator" }
+          },
+          "winner": { "oneOf": [{ "$ref": "#/components/schemas/PlayerMark" }, { "type": "null" }] },
+          "line": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": { "type": "integer", "minimum": 0, "maximum": 8 },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              { "type": "null" }
+            ]
+          },
+          "moves": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/MoveRecord" }
+          },
+          "status": { "type": "string", "enum": ["pending", "active", "finished"] },
+          "timer": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/Timer" },
+              { "type": "null" }
+            ]
+          }
+        }
+      },
+      "ChatEvent": {
+        "type": "object",
+        "required": ["id", "name", "text", "ts"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "text": { "type": "string" },
+          "ts": { "type": "integer" }
+        }
+      },
+      "WebSocketEvents": {
+        "type": "object",
+        "properties": {
+          "client": {
+            "type": "object",
+            "properties": {
+              "join": {
+                "type": "object",
+                "properties": {
+                  "roomId": { "type": "string" },
+                  "token": { "type": "string" },
+                  "name": { "type": "string" }
+                },
+                "required": ["roomId", "token"]
+              },
+              "move": { "$ref": "#/components/schemas/MoveRecord" },
+              "chat": {
+                "type": "object",
+                "required": ["text"],
+                "properties": { "text": { "type": "string" } }
+              },
+              "rematch": { "type": "object" }
+            }
+          },
+          "server": {
+            "type": "object",
+            "properties": {
+              "state": { "$ref": "#/components/schemas/StateEvent" },
+              "chat": { "$ref": "#/components/schemas/ChatEvent" },
+              "presence": { "$ref": "#/components/schemas/PresenceEvent" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

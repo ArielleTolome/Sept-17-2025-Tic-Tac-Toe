@@ -1,0 +1,10 @@
+.ttt-enhancer.theme-dark {
+  --color-bg: #0b0c0f;
+  --color-surface: #151821;
+  --color-text: #e6eaf2;
+  --color-muted: #a7b0c3;
+  --color-accent: #6aa9ff;
+  --color-win: #30d158;
+  --color-lose: #ff453a;
+  --color-draw: #ffd60a;
+}

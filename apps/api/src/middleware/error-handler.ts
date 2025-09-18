@@ -1,4 +1,5 @@
 import { type NextFunction, type Request, type Response } from 'express';
+import { ZodError } from 'zod';
 import { AppError } from '../errors';
 import { logger } from '../logger';
 
@@ -11,6 +12,15 @@ export const errorHandler = (
   if (err instanceof AppError) {
     logger.warn({ err }, 'Handled application error');
     return res.status(err.status).json({ code: err.code, message: err.message });
+  }
+
+  if (err instanceof ZodError) {
+    logger.warn({ err }, 'Validation error');
+    return res.status(400).json({
+      code: 'invalid_input',
+      message: 'Payload validation failed',
+      issues: err.issues,
+    });
   }
 
   logger.error({ err }, 'Unhandled error');

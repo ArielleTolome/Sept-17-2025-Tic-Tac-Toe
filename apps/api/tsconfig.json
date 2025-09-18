@@ -12,6 +12,6 @@
       "@tic-tac-toe/shared/*": ["../../packages/shared/src/*"]
     }
   },
-  "include": ["src", "scripts", "vitest.config.ts"],
+  "include": ["src", "scripts", "tests", "vitest.config.ts"],
   "references": [{ "path": "../../packages/shared" }]
 }

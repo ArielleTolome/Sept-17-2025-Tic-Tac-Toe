@@ -6,6 +6,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
+      include: ['src/client/lib/**/*.ts'],
       lines: 90,
       functions: 90,
       branches: 80,
@@ -13,4 +14,3 @@ export default defineConfig({
     }
   }
 });
-

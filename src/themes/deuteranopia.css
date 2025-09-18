@@ -1,0 +1,5 @@
+.ttt-enhancer.theme-deuteranopia {
+  --color-accent: #0ea5e9;
+  --color-win: #22c55e; /* green still visible but paired with shape cues */
+  --color-lose: #eab308; /* amber */
+}

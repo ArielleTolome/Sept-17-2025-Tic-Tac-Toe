@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Mock Tic-Tac-Toe App</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; padding: 20px; display: grid; place-items: center; height: 100vh; }
+      .wrap { display:grid; gap: 16px; align-items:center; justify-items:center; }
+      .board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 6px; }
+      .cell { display:grid; place-items:center; font-size:48px; background:#f3f4f6; border-radius:8px; cursor:pointer; }
+      .cell:focus { outline: 3px solid #60a5fa; outline-offset:2px }
+      .result { min-height: 24px; }
+      button { padding: 8px 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="result" aria-live="polite"></div>
+      <div class="board" role="grid" data-board>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+        <button class="cell" role="gridcell"></button>
+      </div>
+      <button class="new-game" data-new>New Game</button>
+    </div>
+    <script>
+      (function(){
+        const cells = Array.from(document.querySelectorAll('.cell'))
+        const result = document.querySelector('.result')
+        let turn = 'X'
+        const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+        function winner(){
+          const b = cells.map(c => c.textContent)
+          for (const l of wins) { const [a,b2,c] = l; if (b[a] && b[a]===b[b2] && b[a]===b[c]) return b[a] }
+          if (b.every(Boolean)) return 'draw'
+          return null
+        }
+        cells.forEach((c,i) => c.addEventListener('click', () => {
+          if (c.textContent || winner()) return
+          c.textContent = turn
+          const w = winner()
+          if (w === 'draw') result.textContent = 'Draw'
+          else if (w) result.textContent = w + ' wins'
+          else { turn = turn === 'X' ? 'O' : 'X'; result.textContent = turn + "'s turn" }
+        }))
+        document.querySelector('.new-game').addEventListener('click', () => {
+          cells.forEach(c => c.textContent='')
+          turn='X'; result.textContent='X\'s turn'
+        })
+      })()
+    </script>
+  </body>
+  </html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tic-Tac-Toe Skin</title>
+    <style>
+      html, body { height: 100%; }
+      body { margin: 0; background: #0b0c0f; color: #e6eaf2; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+      .shell { position: fixed; inset: 0; display: grid; grid-template-rows: 48px 1fr; }
+      header { display:flex; align-items:center; justify-content:space-between; padding: 0 12px; border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(21,24,33,.8); backdrop-filter: blur(8px); }
+      header .brand { font-weight: 600; }
+      iframe { width: 100%; height: 100%; border: none; background: white; }
+      .overlay-root { position: fixed; inset: 0; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="brand">TTT Skin</div>
+        <div style="opacity:.8;font-size:12px">Zero-touch overlay</div>
+      </header>
+      <div style="position:relative">
+        <iframe id="app" src="" allow="clipboard-write *"></iframe>
+        <div id="ttt-ui-enhancer-root" class="overlay-root ttt-enhancer-root ttt-enhancer"></div>
+      </div>
+    </div>
+    <script>
+      // Decide target URL
+      const params = new URLSearchParams(location.search)
+      const fallback = (typeof PUBLIC_APP_URL !== 'undefined' && PUBLIC_APP_URL) ? PUBLIC_APP_URL : 'https://example.com'
+      const url = params.get('url') || fallback
+      document.getElementById('app').src = url
+    </script>
+    <script src="../dist/ttt-ui-enhancer.iife.js"></script>
+  </body>
+  </html>

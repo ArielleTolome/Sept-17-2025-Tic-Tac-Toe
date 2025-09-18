@@ -1,0 +1,5 @@
+.ttt-enhancer.theme-protanopia {
+  --color-accent: #0ea5e9; /* blue */
+  --color-win: #10b981;   /* teal */
+  --color-lose: #f97316;  /* orange */
+}

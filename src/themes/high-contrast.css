@@ -1,0 +1,11 @@
+.ttt-enhancer.theme-high-contrast {
+  --color-bg: #000000;
+  --color-surface: #000000;
+  --color-text: #ffffff;
+  --color-muted: #e5e7eb;
+  --color-accent: #ffff00; /* yellow accent for visibility */
+  --color-win: #00ff00;
+  --color-lose: #ff0000;
+  --color-draw: #00ffff;
+  --ring-focus: 0 0 0 3px rgba(255, 255, 0, 0.9);
+}
