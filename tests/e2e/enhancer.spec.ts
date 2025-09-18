@@ -1,10 +1,13 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
+import fs from 'fs'
 
 test.beforeEach(async ({ page }) => {
   const mock = path.resolve('tests/e2e/mock-app/index.html')
-  await page.goto('file://' + mock)
-  await page.addScriptTag({ path: path.resolve('dist/ttt-ui-enhancer.iife.js') })
+  const html = fs.readFileSync(mock, 'utf8')
+  await page.setContent(html)
+  const code = fs.readFileSync(path.resolve('dist/ttt-ui-enhancer.iife.js'), 'utf8')
+  await page.evaluate((c) => { const s = document.createElement('script'); s.textContent = c; document.documentElement.appendChild(s); }, code)
 })
 
 test('attaches overlay and opens settings', async ({ page }) => {

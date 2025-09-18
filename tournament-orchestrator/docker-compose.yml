@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  orchestrator:
+    build: .
+    ports:
+      - '4000:4000'
+    environment:
+      - PORT=4000
+      - API_BASE_URL=http://localhost:8080
+      - WS_BASE_URL=ws://localhost:8080/ws
+      - ALLOWED_ORIGIN=http://localhost:5174
+      - MOCK_CORE=1
+    restart: unless-stopped
+

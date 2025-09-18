@@ -11,10 +11,11 @@ export interface IQueueAdapter {
 
 export class InMemoryQueue implements IQueueAdapter {
   private handlers: Array<{event: 'completed'|'failed', handler: (name: string, payload: JobPayload, result?: any, err?: any)=>void}> = [];
+  constructor(private processor: (name: string, payload: JobPayload)=>Promise<any>) {}
   async add(name: string, payload: JobPayload): Promise<void> {
     setTimeout(async () => {
       try {
-        const result = await this.process(name, payload);
+        const result = await this.processor(name, payload);
         this.handlers.filter(h=>h.event==='completed').forEach(h=>h.handler(name, payload, result));
       } catch (err) {
         this.handlers.filter(h=>h.event==='failed').forEach(h=>h.handler(name, payload, undefined, err));
@@ -23,8 +24,6 @@ export class InMemoryQueue implements IQueueAdapter {
   }
   on(event: 'completed'|'failed', handler: any) { this.handlers.push({event, handler}); }
   async close() { /* noop */ }
-  // to be overridden by user of adapter
-  async process(_name: string, _payload: JobPayload): Promise<any> { return null; }
 }
 
 export class BullMQAdapter implements IQueueAdapter {
@@ -44,4 +43,3 @@ export class BullMQAdapter implements IQueueAdapter {
   on(event: 'completed'|'failed', handler: any) { this.callbacks.push({event, handler}); }
   async close() { await this.worker.close(); await this.queue.close(); await this.events.close(); }
 }
-

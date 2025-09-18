@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  lobby:
+    build: .
+    ports:
+      - '4100:4100'
+    environment:
+      - PORT=4100
+      - API_BASE_URL=http://localhost:8080
+      - ALLOWED_ORIGIN=http://localhost:5175
+      - DB_PATH=/data/elo.db
+      - MOCK_CORE=1
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+

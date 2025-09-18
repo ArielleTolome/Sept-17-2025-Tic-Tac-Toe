@@ -25,6 +25,9 @@ export const en = {
     impossible: 'Impossible',
   },
   game: {
+    ready: 'Ready',
+    away: 'Away',
+    noSpectators: 'No spectators yet',
     yourTurn: "It's your turn",
     opponentTurn: "Opponent's turn",
     aiTurn: "Thinking...",
@@ -53,6 +56,7 @@ export const en = {
     send: 'Send',
     chatPlaceholder: 'Send a friendly message',
     emptyHistory: 'No moves yet',
+    startPosition: 'Start position',
   },
   outcome: {
     youWin: 'You win! 🎉',
