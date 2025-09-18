@@ -1,4 +1,5 @@
 import request from 'supertest';
+import pino from 'pino';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/env', () => ({
@@ -16,13 +17,10 @@ vi.mock('../src/env', () => ({
   },
 }));
 
+const silentLogger = pino({ enabled: false, level: 'silent' });
+
 vi.mock('../src/logger', () => ({
-  logger: {
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-    debug: vi.fn(),
-  },
+  logger: silentLogger,
 }));
 
 const createGameMock = vi.fn();

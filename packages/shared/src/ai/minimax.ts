@@ -1,13 +1,13 @@
-import { Difficulty } from '../constants.js';
+import { Difficulty } from '../constants';
 import {
   applyMove,
   boardToKey,
   calculateOutcome,
   getAvailableMoves,
   getOpposingPlayer,
-} from '../game.js';
-import type { AiMoveResult, AiOptions, Board, PlayerMark } from '../types.js';
-import { createSeededRandom } from './random.js';
+} from '../game';
+import type { AiMoveResult, AiOptions, Board, PlayerMark } from '../types';
+import { createSeededRandom } from './random';
 
 const MOVE_ORDER = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 

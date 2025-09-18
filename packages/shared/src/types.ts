@@ -1,4 +1,5 @@
-import type { Difficulty, GameMode } from './constants.js';
+import type { Difficulty, GameMode } from './constants';
+import type { MovePayload } from './schemas';
 
 export type PlayerMark = 'X' | 'O';
 export type CellValue = PlayerMark | null;
@@ -13,10 +14,6 @@ export interface GameOutcome {
   winner: PlayerMark | null;
   line: WinningLine | null;
   isDraw: boolean;
-}
-
-export interface MovePayload {
-  index: number;
 }
 
 export interface MoveRecord {

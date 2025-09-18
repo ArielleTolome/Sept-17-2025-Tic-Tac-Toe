@@ -1,4 +1,4 @@
-import type { SeededRandom } from '../types.js';
+import type { SeededRandom } from '../types';
 
 const DEFAULT_SEED = 'tic-tac-toe';
 

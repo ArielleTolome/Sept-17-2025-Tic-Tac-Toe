@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { OpenAPIRegistry, OpenAPIGenerator } from 'zod-to-openapi';
+import { OpenAPIGenerator, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 import {
   apiErrorSchema,
