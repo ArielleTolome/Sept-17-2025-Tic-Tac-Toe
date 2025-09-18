@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { OpenAPIGenerator, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
+import { OpenApiGeneratorV31, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 import {
   apiErrorSchema,
@@ -170,9 +170,10 @@ registry.registerPath({
   },
 });
 
-const generator = new OpenAPIGenerator(registry.definitions, '3.1.0');
+const generator = new OpenApiGeneratorV31(registry.definitions);
 
 const document = generator.generateDocument({
+  openapi: '3.1.0',
   info: {
     title: 'Tic-Tac-Toe API',
     version: '1.0.0',

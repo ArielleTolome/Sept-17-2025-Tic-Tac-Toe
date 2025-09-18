@@ -2,11 +2,9 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "types": ["node"],
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
     "paths": {
       "@tic-tac-toe/shared": ["../../packages/shared/src"],
       "@tic-tac-toe/shared/*": ["../../packages/shared/src/*"]
