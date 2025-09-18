@@ -1,15 +1,13 @@
-import type { Server, Socket } from 'socket.io';
 import type {
   Board,
-  ClientToServerEventMap,
   MoveRecord,
   PlayerMark,
   PlayerSlot,
   PresenceEventPayload,
-  ServerToClientEventMap,
   Spectator,
   StateEventPayload,
 } from '@tic-tac-toe/shared';
+import { calculateOutcome, createEmptyBoard, getOpposingPlayer, sanitizeChatText } from '@tic-tac-toe/shared';
 import {
   buildSnapshotFromGame,
   findGameByRoomId,
@@ -19,11 +17,11 @@ import {
   resetGameForRematch,
   updateGameWinner,
 } from '../services/game-service';
-import { calculateOutcome, createEmptyBoard, getOpposingPlayer, sanitizeChatText } from '@tic-tac-toe/shared';
 import type { SocketTokenPayload } from '../auth/jwt';
 import { env } from '../env';
 import { logger } from '../logger';
 import { nanoid } from 'nanoid';
+import type { AuthenticatedSocket, TicTacToeServer } from './types';
 
 interface RoomContext {
   gameId: string;
@@ -39,14 +37,12 @@ interface RoomContext {
   rematchVotes: Set<string>;
 }
 
-type ApiSocket = Socket<ClientToServerEventMap, ServerToClientEventMap> & {
-  data: SocketTokenPayload;
-};
+type ApiSocket = AuthenticatedSocket;
 
 export class RoomManager {
   private readonly rooms = new Map<string, RoomContext>();
 
-  constructor(private readonly io: Server<ClientToServerEventMap, ServerToClientEventMap>) {}
+  constructor(private readonly io: TicTacToeServer) {}
 
   public async ensureRoom(payload: SocketTokenPayload): Promise<RoomContext> {
     const existing = this.rooms.get(payload.roomId);
@@ -210,8 +206,9 @@ export class RoomManager {
       return;
     }
 
-    context.board = [...context.board];
-    context.board[index] = payload.seat;
+    const nextBoard = [...context.board];
+    nextBoard[index] = payload.seat;
+    context.board = nextBoard;
 
     const move: MoveRecord = {
       order: context.moves.length,

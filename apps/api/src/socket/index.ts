@@ -1,13 +1,13 @@
 import type { Server as HttpServer } from 'node:http';
 import { Server } from 'socket.io';
-import type { ClientToServerEventMap, ServerToClientEventMap } from '@tic-tac-toe/shared';
 import { verifySocketToken, type SocketTokenPayload } from '../auth/jwt';
 import { logger } from '../logger';
 import { env } from '../env';
 import { RoomManager } from './room-manager';
+import type { AuthenticatedSocket, TicTacToeServer } from './types';
 
-export const createSocketServer = (httpServer: HttpServer): Server<ClientToServerEventMap, ServerToClientEventMap> => {
-  const io = new Server<ClientToServerEventMap, ServerToClientEventMap>(httpServer, {
+export const createSocketServer = (httpServer: HttpServer): TicTacToeServer => {
+  const io = new Server(httpServer, {
     cors: {
       origin: env.FRONTEND_ORIGIN,
       methods: ['GET', 'POST'],
@@ -39,7 +39,7 @@ export const createSocketServer = (httpServer: HttpServer): Server<ClientToServe
   io.on('connection', (socket) => {
     const payload = (socket as typeof socket & { data: SocketTokenPayload }).data;
     manager
-      .attachSocket(socket as any, payload)
+      .attachSocket(socket as AuthenticatedSocket, payload)
       .catch((error) => {
         logger.error({ error }, 'Failed to attach socket');
         socket.emit('error', { code: 'connection_failed', message: 'Unable to join room' });
