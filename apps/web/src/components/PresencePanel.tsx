@@ -4,8 +4,8 @@ import { t } from '../i18n';
 import type { Seat } from '../state/online-game';
 
 interface PresencePanelProps {
-  players: PlayerSlot[];
-  spectators: Spectator[];
+  players: readonly PlayerSlot[];
+  spectators: readonly Spectator[];
   selfId?: string;
   seat?: Seat;
 }

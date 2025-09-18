@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import { t } from '../i18n';
 
 interface MoveHistoryProps {
-  moves: MoveRecord[];
-  history: TimeTravelEntry[];
+  moves: readonly MoveRecord[];
+  history: readonly TimeTravelEntry[];
   pointer: number;
   onSelect: (index: number) => void;
 }

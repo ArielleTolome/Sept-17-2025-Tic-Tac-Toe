@@ -6,9 +6,10 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "incremental": false,
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "include": ["src"],
   "references": []

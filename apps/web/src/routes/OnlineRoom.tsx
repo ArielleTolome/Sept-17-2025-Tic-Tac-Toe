@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { GameBoard } from '../components/GameBoard';
 import { ChatPanel } from '../components/ChatPanel';
 import { OutcomeModal } from '../components/OutcomeModal';
@@ -49,7 +49,6 @@ export const OnlineRoom: React.FC = () => {
     spectators,
     winner,
     winningLine,
-    moves,
     chat,
     timerExpiresAt,
     gameStatus,

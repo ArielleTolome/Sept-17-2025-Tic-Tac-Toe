@@ -1,6 +1,5 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Difficulty } from '@tic-tac-toe/shared';
 import { DifficultySelector } from '../components/DifficultySelector';
 import { RecentResults } from '../components/RecentResults';
 import { Scoreboard } from '../components/Scoreboard';

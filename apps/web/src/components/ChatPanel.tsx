@@ -3,7 +3,7 @@ import type { ChatEventPayload } from '@tic-tac-toe/shared';
 import { t } from '../i18n';
 
 interface ChatPanelProps {
-  messages: ChatEventPayload[];
+  messages: readonly ChatEventPayload[];
   onSend: (text: string) => void;
   disabled?: boolean;
 }

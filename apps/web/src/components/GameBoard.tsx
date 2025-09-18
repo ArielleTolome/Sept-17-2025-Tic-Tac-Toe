@@ -7,7 +7,7 @@ import { useGameboardNavigation } from '../hooks/use-gameboard-navigation';
 interface GameBoardProps {
   board: Board;
   turn: PlayerMark;
-  winningLine: number[] | null;
+  winningLine: readonly number[] | null;
   disabled?: boolean;
   onSelect: (index: number) => void;
   aiThinking?: boolean;

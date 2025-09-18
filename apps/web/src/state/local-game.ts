@@ -29,7 +29,7 @@ interface LocalGameState {
   difficulty: Difficulty;
   seed: string;
   winner: PlayerMark | null;
-  winningLine: number[] | null;
+  winningLine: readonly number[] | null;
   history: TimeTravelEntry[];
   pointer: number;
   moves: MoveRecord[];
@@ -46,8 +46,10 @@ interface LocalGameState {
   setAiThinking: (value: boolean) => void;
 }
 
-const makeStorage = () =>
-  createJSONStorage<LocalGameState>(() => {
+type PersistedLocalGameState = Pick<LocalGameState, 'scoreboard' | 'results' | 'difficulty' | 'seed'>;
+
+const makeStorage = <Persisted>() =>
+  createJSONStorage<Persisted>(() => {
     if (typeof window === 'undefined') {
       const memory: Record<string, string> = {};
       return {
@@ -89,7 +91,7 @@ const updateScoreboard = (
 };
 
 export const useLocalGameStore = create<LocalGameState>()(
-  persist(
+  persist<LocalGameState, [], [], PersistedLocalGameState>(
     (set, get) => ({
       mode: 'single',
       board: createEmptyBoard(),
@@ -167,35 +169,38 @@ export const useLocalGameStore = create<LocalGameState>()(
         const winner = outcome.winner ?? null;
         const status = outcome.winner || outcome.isDraw ? 'finished' : 'inProgress';
 
-        set((prev) => ({
-          board: nextBoard,
-          turn: nextTurn,
-          history: nextHistory,
-          pointer: nextHistory.length - 1,
-          moves,
-          winningLine,
-          winner,
-          status,
-          scoreboard:
-            status === 'finished' ? updateScoreboard(prev.scoreboard, prev.mode, outcome) : prev.scoreboard,
-          results:
-            status === 'finished' && prev.mode === 'local'
-              ? [
-                  {
-                    mode: prev.mode,
-                    opponent: 'Player O',
-                    outcome:
-                      outcome.winner === 'X'
-                        ? 'win'
-                        : outcome.winner === 'O'
-                        ? 'loss'
-                        : 'draw',
-                    playedAt: Date.now(),
-                  },
-                  ...prev.results,
-                ].slice(0, 5)
-              : prev.results,
-        }));
+        set((prev) => {
+          const shouldRecord = status === 'finished' && prev.mode === 'local';
+          const updatedResults = shouldRecord
+            ? [
+                {
+                  mode: prev.mode,
+                  opponent: 'Player O',
+                  outcome: (outcome.winner === 'X'
+                    ? 'win'
+                    : outcome.winner === 'O'
+                    ? 'loss'
+                    : 'draw') as StoredResult['outcome'],
+                  playedAt: Date.now(),
+                } satisfies StoredResult,
+                ...prev.results,
+              ].slice(0, 5)
+            : prev.results;
+
+          return {
+            board: nextBoard,
+            turn: nextTurn,
+            history: nextHistory,
+            pointer: nextHistory.length - 1,
+            moves,
+            winningLine,
+            winner,
+            status,
+            scoreboard:
+              status === 'finished' ? updateScoreboard(prev.scoreboard, prev.mode, outcome) : prev.scoreboard,
+            results: updatedResults,
+          };
+        });
       },
       jumpTo: (pointer) => {
         const state = get();
@@ -221,7 +226,7 @@ export const useLocalGameStore = create<LocalGameState>()(
     }),
     {
       name: 'ttt-local-game',
-      storage: makeStorage(),
+      storage: makeStorage<PersistedLocalGameState>(),
       partialize: (state) => ({
         scoreboard: state.scoreboard,
         results: state.results,

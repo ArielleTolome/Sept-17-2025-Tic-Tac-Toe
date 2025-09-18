@@ -6,9 +6,7 @@ import {
   type PlayerMark,
   type PlayerSlot,
   type Spectator,
-  type StateEventPayload,
   type ChatEventPayload,
-  type PresenceEventPayload,
 } from '@tic-tac-toe/shared';
 import { createGameSocket, type GameSocket } from '../services/socket';
 
@@ -19,12 +17,12 @@ interface OnlineGameState {
   gameStatus: 'pending' | 'active' | 'finished';
   board: Board;
   turn: PlayerMark;
-  players: PlayerSlot[];
-  spectators: Spectator[];
+  players: readonly PlayerSlot[];
+  spectators: readonly Spectator[];
   winner: PlayerMark | null;
-  winningLine: number[] | null;
-  moves: MoveRecord[];
-  chat: ChatEventPayload[];
+  winningLine: readonly number[] | null;
+  moves: readonly MoveRecord[];
+  chat: readonly ChatEventPayload[];
   timerExpiresAt: number | null;
   rematchPending: boolean;
   error?: string;
@@ -77,7 +75,7 @@ export const useOnlineGameStore = create<OnlineGameState>((set, get) => ({
     socket.on('connect_error', (error) => {
       set({ connection: 'error', error: error.message });
     });
-    socket.on('state', (payload: StateEventPayload) => {
+    socket.on('state', (payload) => {
       set({
         board: payload.board,
         turn: payload.turn,
@@ -90,10 +88,10 @@ export const useOnlineGameStore = create<OnlineGameState>((set, get) => ({
         timerExpiresAt: payload.timer?.expiresAt ?? null,
       });
     });
-    socket.on('presence', (payload: PresenceEventPayload) => {
+    socket.on('presence', (payload) => {
       set({ players: payload.players, spectators: payload.spectators });
     });
-    socket.on('chat', (payload: ChatEventPayload) => {
+    socket.on('chat', (payload) => {
       set((state) => ({ chat: [...state.chat, payload].slice(-50) }));
     });
     socket.on('rematch', ({ accepted }) => {

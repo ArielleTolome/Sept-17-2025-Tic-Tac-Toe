@@ -1,6 +1,4 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-
-console.log('testPath descriptor', Object.getOwnPropertyDescriptor(expect.getState(), 'testPath'));
 import { useLocalGameStore } from '../state/local-game';
 
 const resetStore = () => {

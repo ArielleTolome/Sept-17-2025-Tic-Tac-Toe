@@ -2,7 +2,7 @@ import type { StoredLocalResult } from '@tic-tac-toe/shared';
 import { t } from '../i18n';
 
 interface RecentResultsProps {
-  results: Array<StoredLocalResult & { mode: 'single' | 'local' }>;
+  results: ReadonlyArray<StoredLocalResult & { mode: 'single' | 'local' }>;
 }
 
 const outcomeLabel: Record<StoredLocalResult['outcome'], string> = {
