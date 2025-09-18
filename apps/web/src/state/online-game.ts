@@ -26,6 +26,7 @@ interface OnlineGameState {
   moves: MoveRecord[];
   chat: ChatEventPayload[];
   timerExpiresAt: number | null;
+  rematchPending: boolean;
   error?: string;
   roomId?: string;
   seat: Seat;
@@ -51,6 +52,7 @@ const initialState = {
   moves: [] as MoveRecord[],
   chat: [] as ChatEventPayload[],
   timerExpiresAt: null,
+  rematchPending: false,
   seat: 'spectator' as Seat,
   socket: undefined as GameSocket | undefined,
 };
@@ -94,6 +96,9 @@ export const useOnlineGameStore = create<OnlineGameState>((set, get) => ({
     socket.on('chat', (payload: ChatEventPayload) => {
       set((state) => ({ chat: [...state.chat, payload].slice(-50) }));
     });
+    socket.on('rematch', ({ accepted }) => {
+      set({ rematchPending: !accepted });
+    });
     socket.on('error', (payload) => {
       set({ error: payload.message, connection: 'error' });
     });
@@ -133,6 +138,7 @@ export const useOnlineGameStore = create<OnlineGameState>((set, get) => ({
     const { socket, connection } = get();
     if (!socket || connection !== 'ready') return;
     socket.emit('rematch');
+    set({ rematchPending: true });
   },
   clearError: () => set({ error: undefined, connection: 'ready' }),
 }));

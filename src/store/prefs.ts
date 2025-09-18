@@ -28,8 +28,26 @@ export type Store = {
 
 const KEY = 'ttt-ui-enhancer:v1'
 
+type SafeStorage = { getItem(k: string): string | null; setItem(k: string, v: string): void }
+function getSafeStorage(): SafeStorage {
+  try {
+    // Access can throw under opaque origins (about:blank) or sandboxed iframes
+    const t = '__ttt_test__'
+    window.localStorage.setItem(t, '1')
+    window.localStorage.removeItem(t)
+    return window.localStorage
+  } catch {
+    let mem: Record<string, string> = {}
+    return {
+      getItem: (k) => (k in mem ? mem[k] : null),
+      setItem: (k, v) => { mem[k] = String(v) }
+    }
+  }
+}
+const storage = getSafeStorage()
+
 export function initPreferences(): State {
-  const stored = localStorage.getItem(KEY)
+  const stored = storage.getItem(KEY)
   const base: State = {
     prefs: {
       theme: 'dark', fontScale: 1, reduceMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -67,7 +85,7 @@ export function createStore(initial: State): Store {
 }
 
 export function persist(prefs: Preferences) {
-  localStorage.setItem(KEY, JSON.stringify({ prefs }))
+  storage.setItem(KEY, JSON.stringify({ prefs }))
   applyTokens(prefs)
 }
 
