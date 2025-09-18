@@ -1,0 +1,41 @@
+{
+  "name": "tic-tac-toe-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @tic-tac-toe/api dev\" \"pnpm --filter @tic-tac-toe/web dev\"",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "e2e": "pnpm --filter @tic-tac-toe/web e2e",
+    "lint": "pnpm -r run lint",
+    "format": "pnpm -r run format",
+    "typecheck": "pnpm -r run typecheck",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.6.0",
+    "@commitlint/config-conventional": "^18.6.0",
+    "@eslint/js": "^9.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
+    "eslint-plugin-tailwindcss": "^3.15.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.3",
+    "prettier": "^3.3.2",
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "typescript": "^5.4.5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,md,css,json}": [
+      "pnpm format",
+      "git add"
+    ]
+  }
+}
