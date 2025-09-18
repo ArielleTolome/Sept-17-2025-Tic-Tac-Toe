@@ -7,16 +7,11 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tailwindcss from 'eslint-plugin-tailwindcss';
 
-const tsFiles = ["**/*.ts", "**/*.tsx"]; 
+const tsFiles = ['**/*.ts', '**/*.tsx'];
 
 export default [
   {
-    ignores: [
-      "**/dist/**",
-      "**/build/**",
-      "**/.turbo/**",
-      "**/node_modules/**"
-    ],
+    ignores: ['**/dist/**', '**/build/**', '**/.turbo/**', '**/node_modules/**'],
   },
   js.configs.recommended,
   {
@@ -35,7 +30,7 @@ export default [
     },
     rules: {
       ...tsPlugin.configs['eslint-recommended'].rules,
-      ...tsPlugin.configs['recommended'].rules,
+      ...tsPlugin.configs.recommended.rules,
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -47,12 +42,12 @@ export default [
     },
   },
   {
-    files: ["**/*.tsx"],
+    files: ['**/*.tsx'],
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooks,
       'jsx-a11y': jsxA11y,
-      'tailwindcss': tailwindcss,
+      tailwindcss,
     },
     languageOptions: {
       parser: tsParser,
@@ -88,10 +83,9 @@ export default [
     },
   },
   {
-    files: ["**/*.{js,jsx,ts,tsx}"] ,
+    files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'prettier/prettier': 'off',
     },
   },
 ];
