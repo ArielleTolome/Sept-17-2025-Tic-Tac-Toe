@@ -1,79 +1,150 @@
-# Tic-Tac-Toe UI Enhancer (Zero-Touch)
+# Nebula Tic-Tac-Toe
 
-Production-ready, non-destructive overlay that upgrades visual design, accessibility, and interactions for existing Tic-Tac-Toe web apps — without modifying their code. Ships as a browser extension (MV3), a UserScript, a bookmarklet, and an optional wrapper “skin”.
+A production-ready, full-stack Tic-Tac-Toe platform with single-player AI, local multiplayer, and real-time online matches. The project ships as a pnpm-powered monorepo covering web, API, shared packages, DevOps automation, and an accessibility-first UI.
 
-## Features
-- Modern themes: Light, Dark, High-Contrast, color-vision–safe variants; dyslexia font option
-- Responsive polish: crisp grid, safe-area insets, fluid scaling
-- A11y: aria-live announcements, skip link, visible focus outlines, keyboard shortcuts overlay (press `?`)
-- Board visuals: ghost mark preview, placement micro-animations, animated winning line, confetti (respects reduce motion)
-- Settings: floating gear button with theme, font scale, reduce motion, sounds, haptics, tooltips, and tips on start; import/export JSON
-- Coach marks: step-through guide highlighting key areas
-- Tooltips and toasts: accessible, non-blocking
+## Highlights
 
-Zero-touch: no host DOM nodes are removed or replaced; overlays are siblings and use `pointer-events: none` by default. Preferences are stored locally; no telemetry.
+- ♟️ **Three play modes** – deterministic AI with multiple difficulties, pass-and-play, and WebSocket-backed online rooms with chat, presence, and rematches.
+- 🧠 **Shared TypeScript core** – game logic, schemas, and minimax AI exposed from `packages/shared` and reused everywhere.
+- ⚙️ **Robust backend** – Express, Prisma, JWT-authenticated sockets, rate limiting, structured logging, and OpenAPI documentation.
+- 🎨 **Polished React UI** – Vite, Tailwind, Headless UI, Zustand, and i18n-ready strings with keyboard-first interactions and accessibility baked in.
+- ✅ **Quality gates** – Vitest unit tests, Supertest API checks, Playwright end-to-end coverage, Husky pre-commit hooks, and CI workflow.
+- 🐳 **Deployment-ready** – Multi-stage Dockerfiles, docker-compose stack (API, web, Postgres), and GitHub Actions pipeline.
 
-## Install & Use
+## Architecture
 
-### Browser Extension (MV3)
-1. Build the project: `npm i && npm run build`
-2. Load extension in Chrome: `chrome://extensions` → Enable Developer Mode → Load unpacked → select `extension/` folder.
-3. By default, it runs on all sites. Optional: restrict in extension details to your Tic-Tac-Toe site.
+```
+                   ┌───────────────────────────┐
+                   │        apps/web (Vite)    │
+                   │ React UI  │ Zustand       │
+                   │ Tailwind  │ Playwright    │
+                   └───────────┴──────┬────────┘
+                                      │ REST + WS
+┌─────────────┐   shared types/AI   ┌──▼────────────────────────┐
+│ packages/   │<───────────────────>│    apps/api (Express)     │
+│ shared      │                     │ Prisma │ Socket.IO        │
+│ Zod schemas │                     │ JWT    │ OpenAPI          │
+└─────┬───────┘                     └──┬──────────┬─────────────┘
+      │                               │          │
+      │                               │          │
+      │                         REST/WS│          │Prisma
+      │                               │          │
+      │                               ▼          ▼
+      │                         ┌───────────┐ ┌───────────┐
+      │                         │ Frontend  │ │ Postgres  │
+      │                         │ Consumers │ │ / SQLite  │
+      │                         └───────────┘ └───────────┘
+```
 
-### UserScript
-1. Build: `npm i && npm run build`
-2. Install Tampermonkey or Greasemonkey.
-3. Drag-drop `dist/ttt-ui-enhancer.user.js` into your userscript manager.
-4. Restrict the `@match` in the header if desired.
+## Getting Started
 
-### Bookmarklet
-1. Build: `npm i && npm run build`
-2. Open `dist/bookmarklet.txt` and copy its single-line `javascript:` URL.
-3. Create a new bookmark and paste as the URL; click it on your Tic-Tac-Toe page.
+### Prerequisites
 
-### Wrapper “Skin” App (optional)
-Static page that loads your app in an `<iframe>` and layers this enhancer on top.
-1. Set target URL by adding `?url=https://your.app.example` to `skin/index.html` when opening locally, or edit the default in the file.
-2. Serve `skin/` with any static server (e.g., `npx http-server skin`).
-3. Docker: see `skin/Dockerfile`.
+- Node.js 20+
+- pnpm 8 (`corepack enable` will set it up)
+- (Optional) Docker + Docker Compose
 
-## Build
-- `npm run build` → Vite build + userscript + bookmarklet + copies extension content script
-- Outputs:
-  - `dist/ttt-ui-enhancer.iife.js` (core bundle)
-  - `dist/ttt-ui-enhancer.user.js` (UserScript)
-  - `dist/bookmarklet.txt` (Bookmarklet URL)
-  - `extension/` (MV3 extension with `content.js` and icons)
-  - `themes/` (exportable CSS token sets)
+### Installation
 
-## Tests
-- Unit (Vitest): DOM discovery, preferences store, token switching
-  - `npm run test`
-- E2E (Playwright): attachment, settings panel, shortcuts overlay against a bundled mock app
-  - Build first: `npm run build`
-  - Run: `npm run e2e`
+```bash
+pnpm install
+```
 
-## CI
-GitHub Actions workflow runs typecheck, lint, unit tests, build, and e2e tests.
+### Development
 
-## Security & Privacy
-- No network calls added; no telemetry, no PII capture
-- Preferences stored in `localStorage` under `ttt-ui-enhancer:v1`
-- Overlay is non-destructive and cleans up on page hide/unload
+```bash
+pnpm dev
+```
+
+The command launches both the API (http://localhost:4000) and web client (http://localhost:5173) with live reload. The API reads environment variables from `apps/api/.env` if present; copy `.env.example` to get started.
+
+### Database
+
+- **Development (default):** SQLite file at `apps/api/prisma/dev.db`.
+- **Production/Docker:** PostgreSQL. Update `PRISMA_DB_PROVIDER=postgresql` and provide `DATABASE_URL`.
+
+Run migrations:
+
+```bash
+pnpm --filter @tic-tac-toe/api prisma:migrate
+```
+
+Generate Prisma client:
+
+```bash
+pnpm --filter @tic-tac-toe/api prisma:generate
+```
+
+## Environment Variables
+
+| Scope | Variable | Default | Description |
+|-------|----------|---------|-------------|
+| API | `DATABASE_URL` | `file:./prisma/dev.db` | Prisma connection string |
+| API | `PRISMA_DB_PROVIDER` | `sqlite` | `sqlite` or `postgresql` |
+| API | `WS_JWT_SECRET` | `change-me` | Secret for socket JWTs |
+| API | `JWT_ISSUER` | `tic-tac-toe` | JWT issuer string |
+| API | `FRONTEND_ORIGIN` | `http://localhost:5173` | Allowed CORS origin |
+| API | `PUBLIC_WS_URL` | `http://localhost:4000` | Public WebSocket base URL |
+| API | `TURN_TIMEOUT_SECONDS` | `10` | Multiplayer turn timer |
+| Web | `VITE_API_BASE_URL` | `http://localhost:4000` | REST base URL |
+| Web | `VITE_WS_URL` | `http://localhost:4000` | WebSocket server URL |
+
+Use `.env.example` files in the root, `apps/api/`, and `apps/web/` as templates.
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Run API + web concurrently |
+| `pnpm build` | Build all workspaces |
+| `pnpm test` | Run unit tests across packages |
+| `pnpm e2e` | Run Playwright end-to-end suite |
+| `pnpm lint` | Lint all workspaces |
+| `pnpm typecheck` | Type-check all workspaces |
+| `pnpm --filter @tic-tac-toe/api prisma:migrate` | Create or apply Prisma migrations |
+
+## Testing
+
+- **Unit:** `pnpm test`
+- **API:** Supertest specs under `apps/api/tests`
+- **Shared:** Vitest coverage ≥ 90%
+- **Web:** Vitest store/component tests (jsdom)
+- **E2E:** `pnpm e2e` spins up the stack and runs Playwright flows for single, local, and multiplayer modes.
+
+Playwright can reuse an existing dev server by exporting `PLAYWRIGHT_SKIP_SERVER=1`.
+
+## Docker & Compose
+
+Build images individually:
+
+```bash
+# API
+docker build -t tic-tac-toe-api -f apps/api/Dockerfile .
+# Web
+docker build -t tic-tac-toe-web -f apps/web/Dockerfile .
+```
+
+Run the full stack (web, API, Postgres):
+
+```bash
+docker compose up --build
+```
+
+The web UI is served on http://localhost:5173 and the API on http://localhost:4000.
+
+## Continuous Integration
+
+`.github/workflows/ci.yml` runs lint, typecheck, build, unit tests, and Playwright end-to-end tests on push and pull requests.
 
 ## Troubleshooting
-- “UI Enhancer idle—app not detected.” → The enhancer couldn’t find a 3×3 grid. Ensure your board has recognizable roles/selectors (e.g., `[role="grid"]` with 9 `[role="gridcell"]`).
-- High-contrast: verify your site background doesn’t hide overlays; use the settings panel to switch themes.
-- Reduce motion: match system setting or toggle in settings to eliminate non-essential motion.
-- Sounds/Haptics: muted by default; enable in settings. Some browsers block AudioContext until user gesture.
 
-## Uninstallation
-- Disable or remove the extension, delete the userscript, or remove the bookmarklet. No residual styles remain after a reload.
-
-## Env Variables
-- `PUBLIC_APP_URL` (wrapper only): default URL for `skin/index.html`.
-- Optional defaults via editing `src/store/prefs.ts`: `DEFAULT_THEME`, `DEFAULT_FONT_SCALE`, `DEFAULT_REDUCE_MOTION` (kept simple for bundle size).
+| Issue | Fix |
+|-------|-----|
+| Prisma cannot connect | Verify `DATABASE_URL` and ensure the Postgres container is healthy. |
+| WebSocket auth failures | Regenerate `WS_JWT_SECRET` and restart API/web to refresh tokens. |
+| Playwright hangs in CI | Set `PLAYWRIGHT_SKIP_SERVER=1` to reuse an already running dev server. |
+| ESLint/Prettier mismatch | Run `pnpm format` and `pnpm lint --fix` to auto-resolve. |
 
 ## License
-MIT — see LICENSE.
 
+MIT © 2025 Nebula Tic-Tac-Toe team

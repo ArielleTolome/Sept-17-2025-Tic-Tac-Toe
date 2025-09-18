@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  analytics:
+    build: .
+    ports:
+      - '4200:4200'
+    environment:
+      - PORT=4200
+      - API_BASE_URL=http://localhost:8080
+      - ALLOWED_ORIGIN=http://localhost:5176
+      - MOCK=1
+    restart: unless-stopped
+

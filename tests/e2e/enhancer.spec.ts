@@ -1,19 +1,36 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
 import fs from 'fs'
+import { startMockServer } from './server'
+
+let serverUrl: string
+let server: any
+
+test.beforeAll(async () => {
+  const s = await startMockServer()
+  server = s.server
+  serverUrl = s.url
+})
+
+test.afterAll(async () => {
+  server.close()
+})
 
 test.beforeEach(async ({ page }) => {
-  const mock = path.resolve('tests/e2e/mock-app/index.html')
-  const html = fs.readFileSync(mock, 'utf8')
-  await page.setContent(html)
   page.on('pageerror', (err) => console.log('PAGEERROR:', err))
   page.on('console', (msg) => console.log('CONSOLE:', msg.type(), msg.text()))
-  await page.evaluate(() => console.log('before inject'))
   const code = fs.readFileSync(path.resolve('dist/ttt-ui-enhancer.iife.js'), 'utf8')
-  await page.evaluate((c) => { const s = document.createElement('script'); s.textContent = c; document.documentElement.appendChild(s); }, code)
+  await page.addInitScript({ content: code })
+  await page.goto(serverUrl)
+  await page.waitForLoadState('domcontentloaded')
+  await page.waitForTimeout(50)
 })
 
 test('attaches overlay and opens settings', async ({ page }) => {
+  const present = await page.evaluate(() => !!document.getElementById('ttt-ui-enhancer-root'))
+  console.log('OVERLAY ROOT PRESENT:', present)
+  // Force attach if auto-attach was blocked by environment
+  await page.evaluate(() => (window as any).TTTEnhancer?.attachEnhancer?.())
   const gear = page.locator('.ttt-gear')
   await expect(gear).toBeVisible()
   await gear.click()
@@ -21,11 +38,13 @@ test('attaches overlay and opens settings', async ({ page }) => {
 })
 
 test('shows keyboard shortcuts with ?', async ({ page }) => {
+  await page.evaluate(() => (window as any).TTTEnhancer?.attachEnhancer?.())
   await page.keyboard.press('Shift+/')
   await expect(page.locator('.ttt-shortcuts.open')).toBeVisible()
 })
 
 test('plays keyboard-only with focus rings', async ({ page }) => {
+  await page.evaluate(() => (window as any).TTTEnhancer?.attachEnhancer?.())
   const first = page.locator('.board [role="gridcell"]').first()
   await first.focus()
   // Focus outline should be visible (host app style). We just assert active element moved

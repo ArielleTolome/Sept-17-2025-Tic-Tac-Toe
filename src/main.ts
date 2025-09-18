@@ -11,4 +11,4 @@ import { attachEnhancer } from './module/index'
   }
 })()
 
-export {} // keep as module
+export { attachEnhancer }

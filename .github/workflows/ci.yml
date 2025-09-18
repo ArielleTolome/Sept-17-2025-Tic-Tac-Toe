@@ -2,30 +2,43 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
 
 jobs:
-  build-and-test:
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run build
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-      - run: npm run test
-      - run: npm run e2e
-      - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: |
-            dist
-            extension
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install pnpm
+        run: corepack prepare pnpm@8 --activate
+      - name: Install dependencies
+        run: pnpm install --recursive
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Build
+        run: pnpm build
+      - name: Unit tests
+        run: pnpm test
+      - name: Playwright tests
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          PLAYWRIGHT_API_URL: http://127.0.0.1:4000
+          DATABASE_URL: file:./prisma/dev-ci.db
+          PRISMA_DB_PROVIDER: sqlite
+          WS_JWT_SECRET: ci-secret-key-change
+          JWT_ISSUER: tic-tac-toe
+          FRONTEND_ORIGIN: http://127.0.0.1:5173
+          PUBLIC_WS_URL: http://127.0.0.1:4000
+          TURN_TIMEOUT_SECONDS: 10
+        run: |-
+          npx playwright install --with-deps chromium
+          pnpm e2e

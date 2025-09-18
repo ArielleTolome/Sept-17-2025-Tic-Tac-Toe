@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ttt-bg: rgba(10,10,14,0.6);
+  --ttt-panel: rgba(20,20,28,0.9);
+  --ttt-fg: #f5f7fa;
+  --ttt-accent: #3b82f6;
+}
+
+.ttt-gamify .panel {
+  background: var(--ttt-panel);
+  color: var(--ttt-fg);
+  backdrop-filter: saturate(120%) blur(6px);
+}
+
+.ttt-gamify .btn { @apply px-3 py-1.5 rounded-md text-sm font-medium; }
+.ttt-gamify .btn-primary { background: var(--ttt-accent); color: white; }
+.ttt-gamify .btn-ghost { background: transparent; color: var(--ttt-fg); border: 1px solid rgba(255,255,255,0.15); }
+.ttt-gamify .tag { @apply text-xs px-2 py-0.5 rounded bg-white/10; }
+.ttt-gamify .grid-cols-auto { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+.ttt-gamify .drawer {
+  position: fixed; right: 0; top: 0; bottom: 0; width: 380px; max-width: 92vw; pointer-events: auto;
+}
+
+.ttt-gamify .summary-bar {
+  position: fixed; left: 12px; top: 12px; display: flex; gap: 8px; align-items: center; pointer-events: auto;
+  background: var(--ttt-bg); color: var(--ttt-fg); padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15);
+}
+
+.ttt-gamify .toast-stack { position: fixed; right: 16px; bottom: 16px; display: grid; gap: 8px; pointer-events: none; }
+.ttt-gamify .toast { pointer-events: auto; background: var(--ttt-bg); color: var(--ttt-fg); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 12px; }
+
+.ttt-gamify .level-ring { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--ttt-accent); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+
+[data-theme="light"] .ttt-gamify {
+  --ttt-bg: rgba(245,247,250,0.8);
+  --ttt-panel: rgba(255,255,255,0.95);
+  --ttt-fg: #0b1220;
+  --ttt-accent: #2563eb;
+}
+

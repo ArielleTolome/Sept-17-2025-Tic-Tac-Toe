@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  discord-bot:
+    build: .
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - API_BASE_URL=http://localhost:8080
+      - WS_BASE_URL=ws://localhost:8080/ws
+      - PORT=4300
+      - ALLOWED_ORIGIN=http://localhost:5173
+    ports:
+      - '4300:4300'
+    restart: unless-stopped
+

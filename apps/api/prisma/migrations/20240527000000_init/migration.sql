@@ -1,0 +1,40 @@
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "Game" (
+    "id" TEXT PRIMARY KEY,
+    "roomId" TEXT NOT NULL UNIQUE,
+    "status" TEXT NOT NULL,
+    "xUserId" TEXT,
+    "oUserId" TEXT,
+    "winner" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY ("xUserId") REFERENCES "User" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY ("oUserId") REFERENCES "User" ("id") ON UPDATE CASCADE ON DELETE SET NULL
+);
+
+CREATE TABLE "Move" (
+    "id" TEXT PRIMARY KEY,
+    "gameId" TEXT NOT NULL,
+    "player" TEXT NOT NULL,
+    "index" INTEGER NOT NULL,
+    "order" INTEGER NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY ("gameId") REFERENCES "Game" ("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX "Move_gameId_order_key" ON "Move" ("gameId", "order");
+
+CREATE TABLE "Message" (
+    "id" TEXT PRIMARY KEY,
+    "gameId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY ("gameId") REFERENCES "Game" ("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
