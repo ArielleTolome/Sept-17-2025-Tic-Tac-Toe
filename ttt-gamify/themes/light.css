@@ -1,0 +1,7 @@
+:root[data-theme="light"] {
+  --ttt-bg: rgba(245,247,250,0.8);
+  --ttt-panel: rgba(255,255,255,0.95);
+  --ttt-fg: #0b1220;
+  --ttt-accent: #2563eb;
+}
+

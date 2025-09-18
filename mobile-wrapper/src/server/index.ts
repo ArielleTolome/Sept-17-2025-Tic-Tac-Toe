@@ -1,8 +1,8 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import { rateLimit } from 'express-rate-limit';
 import pinoHttp from 'pino-http';
+import { rateLimit } from 'express-rate-limit';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,7 +10,6 @@ import { logger } from './logger';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-
 app.use(helmet());
 app.disable('x-powered-by');
 app.use((req, res, next) => {
@@ -31,11 +30,10 @@ app.use(['/api'], (req, res, next) => {
 
 app.get('/healthz', (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
-// Serve built extension folder for popup preview
-const extDir = path.resolve(__dirname, '../../dist');
-app.use(express.static(extDir));
+const clientDir = path.resolve(__dirname, '../../dist/client');
+app.use(express.static(clientDir));
+app.get('*', (_req, res) => res.sendFile(path.join(clientDir, 'index.html')));
 
-app.get('*', (_req, res) => res.sendFile(path.join(extDir, 'popup.html')));
+const port = Number(process.env.PORT || 4400);
+app.listen(port, () => logger.info({ port }, 'mobile wrapper preview started'));
 
-const port = Number(process.env.PORT || 4305);
-app.listen(port, () => logger.info({ port }, 'theme injector preview server started'));

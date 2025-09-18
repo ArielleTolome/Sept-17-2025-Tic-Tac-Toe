@@ -8,7 +8,9 @@ fs.mkdirSync(distRoot, { recursive: true });
 
 // Build overlay bundle (IIFE)
 await build({ configFile: 'vite.config.ts' });
-fs.copyFileSync('dist/ttt-gamify.iife.js', path.join(distRoot, 'overlay.iife.js'));
+const overlayCode = fs.readFileSync('dist/ttt-gamify.iife.js');
+fs.mkdirSync(distRoot, { recursive: true });
+fs.writeFileSync(path.join(distRoot, 'overlay.iife.js'), overlayCode);
 
 // Copy extension files
 fs.copyFileSync('extension/manifest.json', path.join(distRoot, 'manifest.json'));
@@ -25,4 +27,3 @@ for (const size of [16,32,48,128]) {
 }
 
 console.log('Extension packaged at', distRoot);
-

@@ -1,0 +1,12 @@
+node_modules
+android
+ios
+build
+dist
+web
+.DS_Store
+coverage
+.env
+*.log
+playwright-report
+test-results

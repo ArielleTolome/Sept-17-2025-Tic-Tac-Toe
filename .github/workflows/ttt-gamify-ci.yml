@@ -1,0 +1,51 @@
+name: ttt-gamify CI
+
+on:
+  push:
+    paths:
+      - 'ttt-gamify/**'
+  pull_request:
+    paths:
+      - 'ttt-gamify/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'ttt-gamify/package.json'
+      - name: Install
+        working-directory: ttt-gamify
+        run: npm install
+      - name: Typecheck
+        working-directory: ttt-gamify
+        run: npm run typecheck
+      - name: Lint
+        working-directory: ttt-gamify
+        run: echo "(eslint optional in this sample)"
+      - name: Build
+        working-directory: ttt-gamify
+        run: npm run build
+      - name: Package artifacts
+        working-directory: ttt-gamify
+        run: npm run package:all
+      - name: Install Playwright Browsers
+        working-directory: ttt-gamify
+        run: npx playwright install --with-deps chromium
+      - name: Unit tests
+        working-directory: ttt-gamify
+        run: npm test --silent
+      - name: E2E tests
+        working-directory: ttt-gamify
+        run: npm run e2e
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: ttt-gamify-dist
+          path: ttt-gamify/dist

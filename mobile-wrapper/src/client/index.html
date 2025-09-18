@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>TicTacToe Mobile</title>
+    <style>
+      :root { --bg: #0b0f19; --fg: #f4f7ff; }
+      html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+      .toolbar { display: flex; gap: 8px; padding: 8px; align-items: center; border-bottom: 1px solid #334155; background: #0f172a; position: sticky; top: 0; z-index: 2; }
+      .btn { background: #1f4ed8; color: white; border: 0; padding: 8px 12px; border-radius: 6px; }
+      .webview { position: absolute; top: 48px; bottom: 0; left: 0; right: 0; }
+      .offline { padding: 16px; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar" role="toolbar" aria-label="Controls">
+      <button id="refresh" class="btn" aria-label="Refresh">Refresh</button>
+      <button id="home" class="btn" aria-label="Home">Home</button>
+      <span id="status" style="font-size: 12px; color: #94a3b8">Connecting…</span>
+    </div>
+    <iframe id="web" class="webview" title="TicTacToe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    <div id="offline" class="offline hidden" role="alert">
+      <h1>Offline</h1>
+      <p>You appear to be offline. Pull to refresh or tap Refresh when back online.</p>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
+

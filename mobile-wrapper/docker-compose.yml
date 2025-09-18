@@ -1,0 +1,13 @@
+version: '3.9'
+services:
+  mobile-wrapper:
+    build: .
+    ports:
+      - '4400:4400'
+    environment:
+      - PUBLIC_WEB_URL=http://localhost:5173
+      - API_BASE_URL=http://localhost:8080
+      - WS_BASE_URL=ws://localhost:8080/ws
+      - PORT=4400
+    restart: unless-stopped
+

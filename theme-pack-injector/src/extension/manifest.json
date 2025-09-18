@@ -5,7 +5,7 @@
   "description": "Apply alternate themes to Tic-Tac-Toe web app via CSS variables.",
   "action": {
     "default_title": "TTT Themes",
-    "default_popup": "extension/popup.html"
+    "default_popup": "popup.html"
   },
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
@@ -21,4 +21,3 @@
     }
   ]
 }
-

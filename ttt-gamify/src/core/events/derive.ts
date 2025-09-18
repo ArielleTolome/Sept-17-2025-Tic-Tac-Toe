@@ -1,11 +1,11 @@
 import { discoverBoard } from './domDiscovery';
 import { eventBus } from './eventBus';
-import { loadXp, addXp, xpForOutcome } from '../models/xp';
+import { loadXp, addXp, xpForOutcome, getXp } from '../models/xp';
 import { ensureSummaryLoaded, selectSummary } from '../models/summary';
 import { CONFIG } from '../config';
 import { trackGameEnd, trackMove, loadAchievements } from '../achievements/engine';
-import { getProfile } from '../identity';
 import { updateLocalLeaderboard } from '../leaderboard';
+import { loadStreak, getStreak, bumpStreakOnPlay } from '../streak';
 
 type State = {
   startedAt: number;
@@ -25,6 +25,7 @@ export async function bootEventLayer() {
   await ensureSummaryLoaded();
   await loadXp();
   await loadAchievements();
+  await loadStreak();
   eventBus.emit('SESSION_START');
 
   const hook = () => {
@@ -88,9 +89,13 @@ export async function bootEventLayer() {
       const totalMs = performance.now() - state.startedAt;
       trackGameEnd(outcome, { totalMs, moves: state.cellTexts.filter(Boolean).length, firstMoveIndex: state.firstMoveIndex });
       const isOnline = location.href.includes('/room') || /online|lobby|room/i.test(document.body.textContent || '');
+      const xpState = getXp();
+      const firstGameOfDay = xpState.todayXp === 0;
+      await bumpStreakOnPlay();
+      const streakDays = Math.min(5, getStreak().days);
       const xp = xpForOutcome(
         outcome === 'win' ? (isOnline ? 'win_online' : 'win_local') : (outcome === 'draw' ? 'draw' : 'loss'),
-        { firstGameOfDay: true, totalMs, streakBonus: 0, cap: CONFIG.DAILY_XP_CAP }
+        { firstGameOfDay, totalMs, streakBonus: streakDays, cap: CONFIG.DAILY_XP_CAP }
       );
       const { level, totalXp } = await addXp(xp);
       if (level) eventBus.emit('LEVEL_UP', { level, totalXp });
@@ -114,4 +119,3 @@ export async function bootEventLayer() {
   const mo = new MutationObserver(() => tryHook());
   mo.observe(document.body, { childList: true, subtree: true });
 }
-

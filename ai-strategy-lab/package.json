@@ -1,0 +1,49 @@
+{
+  "name": "ttt-ai-strategy-lab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-vs-AI Simulator & Strategy Lab for Tic-Tac-Toe with heatmaps and exports",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsup src/cli/index.ts --format esm --target node20 --dts --out-dir dist/cli && tsup src/server/index.ts --format esm --target node20 --out-dir dist/server",
+    "preview": "node dist/server/index.js",
+    "start": "node dist/cli/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "test": "vitest run --coverage",
+    "test:e2e": "playwright test"
+  },
+  "engines": { "node": ">=20.0.0" },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "pino": "^9.2.0",
+    "pino-http": "^10.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@eslint/js": "^9.10.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "axe-core": "^4.8.4",
+    "eslint": "^9.10.0",
+    "eslint-config-prettier": "^9.1.0",
+    "playwright": "^1.48.0",
+    "prettier": "^3.3.3",
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.3",
+    "vitest": "^2.1.1"
+  }
+}
+
