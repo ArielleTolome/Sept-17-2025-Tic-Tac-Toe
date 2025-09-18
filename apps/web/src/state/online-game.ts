@@ -66,26 +66,39 @@ export const useOnlineGameStore = create<OnlineGameState>((set, get) => ({
 
     const socket = createGameSocket(url, token);
 
-    const safeSet = (partial: Partial<OnlineGameState> | ((state: OnlineGameState) => Partial<OnlineGameState>)) =>
-      set(partial as any);
-
-    socket.on('connect', () => {
-      safeSet({ connection: 'ready', error: undefined });
+        socket.on('connect', () => {
+      set({ connection: 'ready', error: undefined });
     });
     socket.on('disconnect', () => {
-      safeSet({ connection: 'connecting' });
+      set({ connection: 'connecting' });
     });
     socket.on('connect_error', (error) => {
-      safeSet({ connection: 'error', error: error.message });
+      set({ connection: 'error', error: error.message });
     });
-    socket.on('state', (payload) => handleState(payload, (partial) => safeSet(partial)));
-    socket.on('presence', (payload) => handlePresence(payload, (partial) => safeSet(partial)));
-    socket.on('chat', (payload) => handleChat(payload, (partial) => safeSet(partial)));
+    socket.on('state', (payload: StateEventPayload) => {
+      set({
+        board: payload.board,
+        turn: payload.turn,
+        players: payload.players,
+        spectators: payload.spectators,
+        winner: payload.winner,
+        winningLine: payload.line,
+        moves: payload.moves,
+        gameStatus: payload.status,
+        timerExpiresAt: payload.timer?.expiresAt ?? null,
+      });
+    });
+    socket.on('presence', (payload: PresenceEventPayload) => {
+      set({ players: payload.players, spectators: payload.spectators });
+    });
+    socket.on('chat', (payload: ChatEventPayload) => {
+      set((state) => ({ chat: [...state.chat, payload].slice(-50) }));
+    });
     socket.on('error', (payload) => {
-      safeSet({ error: payload.message, connection: 'error' });
+      set({ error: payload.message, connection: 'error' });
     });
 
-    safeSet({
+    set({
       ...initialState,
       connection: 'connecting',
       roomId,
