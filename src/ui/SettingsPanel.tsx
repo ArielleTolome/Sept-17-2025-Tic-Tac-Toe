@@ -1,5 +1,6 @@
 import type { JSX } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
+
 import type { Preferences, Store } from '../store/prefs'
 import { clamp } from '../utils/misc'
 import { Close, Gear, Help, Info } from './Icons'
@@ -57,7 +58,7 @@ export function Settings({ store }: Props) {
           } else {
             showToast('Preferences file is empty')
           }
-        } catch (err) {
+        } catch {
           showToast('Unable to import preferences')
         }
       })

@@ -63,7 +63,9 @@ export function initPreferences(): State {
     try {
       const parsed = JSON.parse(stored)
       Object.assign(base.prefs, parsed.prefs || parsed) // accept old shape
-    } catch {}
+    } catch {
+      /* ignore corrupted preference payloads */
+    }
   }
   return base
 }
@@ -106,7 +108,7 @@ function applyTokens(prefs: Preferences) {
 function safeCall(fn: () => void) {
   try {
     fn()
-  } catch (err) {
+  } catch {
     /* intentionally ignore subscriber errors */
   }
 }

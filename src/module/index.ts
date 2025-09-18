@@ -1,9 +1,10 @@
 import { h, render } from 'preact'
-import { RootOverlay } from '../ui/RootOverlay'
-import { ensureStyles } from '../styles/inject'
-import { createStore, initPreferences } from '../store/prefs'
+
 import { discover } from '../dom/discovery'
 import { observeDom } from '../dom/observers'
+import { createStore, initPreferences } from '../store/prefs'
+import { ensureStyles } from '../styles/inject'
+import { RootOverlay } from '../ui/RootOverlay'
 
 let mounted = false
 
@@ -58,22 +59,22 @@ export function attachEnhancer() {
   window.addEventListener('pagehide', () => {
     try {
       unobserve()
-    } catch (err) {
+    } catch {
       /* ignore cleanup chain failures */
     }
     try {
       render(null, root)
-    } catch (err) {
+    } catch {
       /* ignore cleanup chain failures */
     }
     try {
       root.remove()
-    } catch (err) {
+    } catch {
       /* ignore cleanup chain failures */
     }
     try {
       live.remove()
-    } catch (err) {
+    } catch {
       /* ignore cleanup chain failures */
     }
     mounted = false

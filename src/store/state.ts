@@ -1,4 +1,4 @@
-import { readBoardText, computeWinner, nextPlayer } from '../dom/discovery'
+import { computeWinner, nextPlayer, readBoardText } from '../dom/discovery'
 import type { Store } from './prefs'
 
 export type GameStatus = {

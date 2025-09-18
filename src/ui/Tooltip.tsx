@@ -1,7 +1,8 @@
-import { h } from 'preact'
+import type { ComponentChildren } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
-type Props = { text: string; children: any }
+type Props = { text: string; children: ComponentChildren }
+
 export function Tooltip({ text, children }: Props) {
   const [open, setOpen] = useState(false)
   const [pos, setPos] = useState({ x: 0, y: 0 })
@@ -9,22 +10,37 @@ export function Tooltip({ text, children }: Props) {
 
   useEffect(() => {
     const el = ref.current?.firstElementChild as HTMLElement | null
-    if (!el) return
-    let tid: any
-    const onEnter = (e: MouseEvent) => { clearTimeout(tid); tid = setTimeout(() => setOpen(true), 300); setPos({ x: e.clientX + 8, y: e.clientY + 8 }) }
-    const onLeave = () => { clearTimeout(tid); setOpen(false) }
-    const onMove = (e: MouseEvent) => setPos({ x: e.clientX + 8, y: e.clientY + 8 })
-    el.addEventListener('mouseenter', onEnter)
-    el.addEventListener('mouseleave', onLeave)
-    el.addEventListener('mousemove', onMove)
-    el.addEventListener('focus', () => setOpen(true))
-    el.addEventListener('blur', () => setOpen(false))
+    if (!el) return undefined
+
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const updatePosition = (event: MouseEvent) => {
+      setPos({ x: event.clientX + 8, y: event.clientY + 8 })
+    }
+    const handleEnter = (event: MouseEvent) => {
+      clearTimeout(timer)
+      updatePosition(event)
+      timer = setTimeout(() => setOpen(true), 300)
+    }
+    const handleLeave = () => {
+      clearTimeout(timer)
+      setOpen(false)
+    }
+    const handleFocus = () => setOpen(true)
+    const handleBlur = () => setOpen(false)
+
+    el.addEventListener('mouseenter', handleEnter)
+    el.addEventListener('mouseleave', handleLeave)
+    el.addEventListener('mousemove', updatePosition)
+    el.addEventListener('focus', handleFocus)
+    el.addEventListener('blur', handleBlur)
+
     return () => {
-      el.removeEventListener('mouseenter', onEnter)
-      el.removeEventListener('mouseleave', onLeave)
-      el.removeEventListener('mousemove', onMove)
-      el.removeEventListener('focus', () => setOpen(true))
-      el.removeEventListener('blur', () => setOpen(false))
+      clearTimeout(timer)
+      el.removeEventListener('mouseenter', handleEnter)
+      el.removeEventListener('mouseleave', handleLeave)
+      el.removeEventListener('mousemove', updatePosition)
+      el.removeEventListener('focus', handleFocus)
+      el.removeEventListener('blur', handleBlur)
     }
   }, [])
 
@@ -35,4 +51,3 @@ export function Tooltip({ text, children }: Props) {
     </div>
   )
 }
-

@@ -1,4 +1,3 @@
-import { h } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 
 type Toast = { id: number, text: string }
@@ -18,8 +17,9 @@ export function Toasts() {
   }, [])
   return (
     <div aria-live="polite" class="ttt-toasts">
-      {items.map(it => (<div class="ttt-toast" role="status">{it.text}</div>))}
+      {items.map(it => (
+        <div key={it.id} class="ttt-toast" role="status">{it.text}</div>
+      ))}
     </div>
   )
 }
-

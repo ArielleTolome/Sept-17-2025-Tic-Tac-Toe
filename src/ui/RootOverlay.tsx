@@ -1,14 +1,16 @@
+import type { JSX } from 'preact'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
+
 import type { Store } from '../store/prefs'
-import { getGameStatus } from '../store/state'
-import { liveSay, isTypingInTextField } from '../utils/a11y'
+import { type GameStatus, getGameStatus } from '../store/state'
+import { isTypingInTextField, liveSay } from '../utils/a11y'
 import { burstConfetti } from '../utils/confetti'
-import { playDraw, playPlace, playWin } from '../utils/sound'
 import { vibrate } from '../utils/haptics'
-import { Settings } from './SettingsPanel'
-import { Toasts, showToast } from './Toasts'
-import { ShortcutsOverlay } from './ShortcutsOverlay'
+import { playDraw, playPlace, playWin } from '../utils/sound'
 import { CoachMarks } from './CoachMarks'
+import { Settings } from './SettingsPanel'
+import { ShortcutsOverlay } from './ShortcutsOverlay'
+import { showToast, Toasts } from './Toasts'
 
 type Props = { store: Store, liveRegionId: string }
 
@@ -77,25 +79,27 @@ export function RootOverlay({ store, liveRegionId }: Props) {
 
   // Maintain overlay position relative to board
   const boardElement = store.getState().discovery.board
-  const style = useMemo(() => {
-    if (!boardElement) return { display: 'none' } as const
-    const r = boardElement.getBoundingClientRect()
-    return {
-      position: 'fixed' as const,
-      left: `${r.left}px`,
-      top: `${r.top}px`,
-      width: `${r.width}px`,
-      height: `${r.height}px`,
+  const overlayStyle = useMemo<JSX.CSSProperties>(() => {
+    if (!boardElement) {
+      return { display: 'none' }
     }
-  }, [boardElement, status.board])
+    const rect = boardElement.getBoundingClientRect()
+    return {
+      position: 'fixed',
+      left: `${rect.left}px`,
+      top: `${rect.top}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+    }
+  }, [boardElement])
 
   return (
     <div class="ttt-enhancer">
       {!attached && (
         <div class="ttt-toast" style="position:fixed; right:12px; bottom:12px; pointer-events:none;">UI Enhancer idle—app not detected.</div>
       )}
-      <div ref={overlayRef} class="ttt-overlay" style={style as Record<string, string>} aria-hidden="true">
-        <GridDecoration store={store} statusKey={`${status.board.join('')}-${status.winLine?.join('-') || 'none'}`} />
+      <div ref={overlayRef} class="ttt-overlay" style={overlayStyle} aria-hidden="true">
+        <GridDecoration store={store} status={status} />
       </div>
       <Settings store={store} />
       <ShortcutsOverlay store={store} />
@@ -105,10 +109,9 @@ export function RootOverlay({ store, liveRegionId }: Props) {
   )
 }
 
-function GridDecoration({ store, statusKey }: { store: Store, statusKey: string }) {
+function GridDecoration({ status, store }: { status: GameStatus; store: Store }) {
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const cells = store.getState().discovery.cells || []
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -141,7 +144,6 @@ function GridDecoration({ store, statusKey }: { store: Store, statusKey: string 
       ctx.stroke()
     }
 
-    const status = getGameStatus(store)
     if (status.winLine) {
       ctx.strokeStyle = getComputedStyle(document.querySelector('.ttt-enhancer-root') || document.body).getPropertyValue('--color-win').trim() || '#30d158'
       ctx.lineWidth = 6
@@ -158,7 +160,6 @@ function GridDecoration({ store, statusKey }: { store: Store, statusKey: string 
 
     const prefs = store.getState().prefs
     if (prefs.ghostMarks && hoverIdx != null) {
-      const status = getGameStatus(store)
       const index = hoverIdx
       const cx = ox + cs * (index % 3) + cs / 2
       const cy = oy + cs * Math.floor(index / 3) + cs / 2
@@ -189,7 +190,7 @@ function GridDecoration({ store, statusKey }: { store: Store, statusKey: string 
       }
       ctx.restore()
     }
-  }, [hoverIdx, statusKey, store])
+  }, [hoverIdx, status, store])
 
   useEffect(() => {
     draw()
@@ -200,10 +201,11 @@ function GridDecoration({ store, statusKey }: { store: Store, statusKey: string 
   }, [draw])
 
   useEffect(() => {
-    if (!cells.length) return undefined
+    const currentCells = store.getState().discovery.cells ?? []
+    if (!currentCells.length) return undefined
     const leave = () => setHoverIdx(null)
-    const enterHandlers = cells.map((_, i) => () => setHoverIdx(i))
-    cells.forEach((el, i) => {
+    const enterHandlers = currentCells.map((_, i) => () => setHoverIdx(i))
+    currentCells.forEach((el, i) => {
       const enter = enterHandlers[i]
       el.addEventListener('mouseenter', enter)
       el.addEventListener('focus', enter)
@@ -211,7 +213,7 @@ function GridDecoration({ store, statusKey }: { store: Store, statusKey: string 
       el.addEventListener('blur', leave)
     })
     return () => {
-      cells.forEach((el, i) => {
+      currentCells.forEach((el, i) => {
         const enter = enterHandlers[i]
         el.removeEventListener('mouseenter', enter)
         el.removeEventListener('focus', enter)
@@ -219,13 +221,12 @@ function GridDecoration({ store, statusKey }: { store: Store, statusKey: string 
         el.removeEventListener('blur', leave)
       })
     }
-  }, [cells])
+  }, [status, store])
 
   return <canvas ref={canvasRef} class="ttt-canvas" aria-hidden="true"></canvas>
 }
 
 function animateLine(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) {
-  const dist = Math.hypot(x1-x0, y1-y0)
   const steps = 24
   let t = 0
   const rm = matchMedia('(prefers-reduced-motion: reduce)').matches

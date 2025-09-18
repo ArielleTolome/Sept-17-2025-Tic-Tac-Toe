@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
+
 import type { Store } from '../store/prefs'
 import { Arrow, Close } from './Icons'
 

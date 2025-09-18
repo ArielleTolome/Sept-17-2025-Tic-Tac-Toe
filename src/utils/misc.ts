@@ -1,5 +1,12 @@
+type ElementTag = keyof globalThis.HTMLElementTagNameMap
+
 export function clamp(n: number, min: number, max: number) { return Math.min(max, Math.max(min, n)) }
-export function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e }
+export function el<K extends ElementTag>(tag: K, cls?: string, text?: string) {
+  const element = document.createElement(tag) as globalThis.HTMLElementTagNameMap[K]
+  if (cls) element.className = cls
+  if (text) element.textContent = text
+  return element
+}
 
 export function isVisible(el: Element | null): boolean {
   if (!el) return false

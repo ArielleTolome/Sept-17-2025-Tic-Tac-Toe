@@ -6,12 +6,12 @@ export function observeDom(onChange: () => void) {
   const cleanup = () => {
     try {
       mo.disconnect()
-    } catch (err) {
+    } catch {
       /* observer already disposed */
     }
     try {
       ro.disconnect()
-    } catch (err) {
+    } catch {
       /* observer already disposed */
     }
   }

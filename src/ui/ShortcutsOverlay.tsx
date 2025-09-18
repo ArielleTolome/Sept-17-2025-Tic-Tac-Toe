@@ -1,19 +1,22 @@
-import { h } from 'preact'
-import { useEffect } from 'preact/hooks'
+import { useCallback, useEffect } from 'preact/hooks'
+
 import type { Store } from '../store/prefs'
 import { Close } from './Icons'
 
 export function ShortcutsOverlay({ store }: { store: Store }) {
   const { shortcutsOpen } = store.getState()
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
-    }
-    if (shortcutsOpen) document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [shortcutsOpen])
+  const close = useCallback(() => {
+    store.setState({ shortcutsOpen: false })
+  }, [store])
 
-  function close() { store.setState({ shortcutsOpen: false }) }
+  useEffect(() => {
+    if (!shortcutsOpen) return undefined
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [close, shortcutsOpen])
   return (
     <div class={"ttt-shortcuts" + (shortcutsOpen ? ' open' : '')} role="dialog" aria-modal="false" aria-label="Keyboard Shortcuts">
       <div class="ttt-shortcuts-panel">
@@ -32,4 +35,3 @@ export function ShortcutsOverlay({ store }: { store: Store }) {
     </div>
   )
 }
-
