@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn { @apply px-3 py-2 rounded bg-slate-800 text-white border border-slate-600 hover:bg-slate-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary; }
+.btn-active { @apply bg-primary border-primary; }
+

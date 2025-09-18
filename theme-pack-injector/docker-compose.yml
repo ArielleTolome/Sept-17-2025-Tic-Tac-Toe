@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  theme-injector:
+    build: .
+    ports:
+      - '4305:4305'
+    environment:
+      - PORT=4305
+    restart: unless-stopped
+
