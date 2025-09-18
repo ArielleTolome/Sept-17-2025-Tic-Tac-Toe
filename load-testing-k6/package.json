@@ -1,0 +1,35 @@
+{
+  "name": "ttt-load-testing-k6",
+  "version": "1.0.0",
+  "private": true,
+  "description": "k6 load & soak testing suite for Tic-Tac-Toe with Node orchestration",
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --target node20 --dts --out-dir dist",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "test": "vitest run --coverage",
+    "k6:smoke": "node dist/index.js smoke",
+    "k6:rps": "node dist/index.js rps",
+    "k6:ws": "node dist/index.js ws",
+    "k6:soak": "node dist/index.js soak"
+  },
+  "engines": { "node": ">=20.0.0" },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.10.0",
+    "@types/node": "^20.12.12",
+    "eslint": "^9.10.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1"
+  }
+}
+

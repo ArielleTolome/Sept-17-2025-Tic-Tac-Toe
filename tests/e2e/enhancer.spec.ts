@@ -19,9 +19,8 @@ test.afterAll(async () => {
 test.beforeEach(async ({ page }) => {
   page.on('pageerror', (err) => console.log('PAGEERROR:', err))
   page.on('console', (msg) => console.log('CONSOLE:', msg.type(), msg.text()))
-  const code = fs.readFileSync(path.resolve('dist/ttt-ui-enhancer.iife.js'), 'utf8')
-  await page.addInitScript({ content: code })
   await page.goto(serverUrl)
+  await page.addScriptTag({ url: serverUrl + '/bundle.js' })
   await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(50)
 })
