@@ -1,0 +1,49 @@
+{
+  "name": "@tic-tac-toe/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e .env -- tsx watch src/index.ts",
+    "build": "tsup src/index.ts --format esm --dts false --out-dir dist",
+    "start": "node dist/index.js",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "openapi": "tsx scripts/generate-openapi.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.15.0",
+    "@tic-tac-toe/shared": "workspace:*",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^6.10.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^5.0.7",
+    "pino": "^9.0.0",
+    "pino-http": "^9.0.1",
+    "socket.io": "^4.7.5",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.23.8",
+    "zod-to-openapi": "^7.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.12.12",
+    "dotenv-cli": "^7.2.2",
+    "pino-pretty": "^11.2.2",
+    "prisma": "^5.15.0",
+    "supertest": "^6.4.2",
+    "tsup": "^8.1.0",
+    "tsx": "^4.7.2",
+    "vitest": "^1.6.1"
+  }
+}

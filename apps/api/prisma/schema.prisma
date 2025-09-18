@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = env("PRISMA_DB_PROVIDER")
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  gamesX    Game[]   @relation("PlayerX")
+  gamesO    Game[]   @relation("PlayerO")
+}
+
+model Game {
+  id        String    @id @default(cuid())
+  roomId    String    @unique
+  status    String
+  xUserId   String?
+  oUserId   String?
+  winner    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  moves     Move[]
+  messages  Message[]
+
+  playerX User? @relation("PlayerX", fields: [xUserId], references: [id])
+  playerO User? @relation("PlayerO", fields: [oUserId], references: [id])
+}
+
+model Move {
+  id        String   @id @default(cuid())
+  gameId    String
+  player    String
+  index     Int
+  order     Int
+  createdAt DateTime @default(now())
+  game      Game     @relation(fields: [gameId], references: [id])
+
+  @@unique([gameId, order])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  gameId    String
+  name      String
+  text      String
+  createdAt DateTime @default(now())
+  game      Game     @relation(fields: [gameId], references: [id])
+}

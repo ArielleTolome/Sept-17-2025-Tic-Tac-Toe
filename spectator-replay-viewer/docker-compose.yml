@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  viewer:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - PORT=3000
+      - MOCK=1
+      - ALLOWED_ORIGIN=http://localhost:5173
+      - API_BASE_URL=http://localhost:3000
+      - WS_BASE_URL=ws://localhost:3000/ws
+    restart: unless-stopped
+

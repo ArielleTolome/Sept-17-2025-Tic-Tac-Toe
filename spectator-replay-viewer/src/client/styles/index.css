@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn {
+  @apply px-3 py-1 rounded bg-slate-800 text-white border border-slate-600 hover:bg-slate-700 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary-600;
+}
+
+/* High-contrast defaults and focus styles */
+:root {
+  --bg: #0b0f19;
+  --fg: #f4f7ff;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+/* Visually hidden utility for a11y */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+

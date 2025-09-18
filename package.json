@@ -1,41 +1,37 @@
 {
-  "name": "tic-tac-toe-monorepo",
-  "private": true,
+  "name": "ttt-ui-enhancer",
   "version": "1.0.0",
+  "private": true,
+  "description": "Zero-touch UI/UX and accessibility enhancer for Tic-Tac-Toe web apps.",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"pnpm --filter @tic-tac-toe/api dev\" \"pnpm --filter @tic-tac-toe/web dev\"",
-    "build": "pnpm -r run build",
-    "test": "pnpm -r run test",
-    "e2e": "pnpm --filter @tic-tac-toe/web e2e",
-    "lint": "pnpm -r run lint",
-    "format": "pnpm -r run format",
-    "typecheck": "pnpm -r run typecheck",
-    "prepare": "husky install"
+    "dev": "vite",
+    "build": "vite build && node scripts/build-userscript.mjs && node scripts/build-bookmarklet.mjs && node scripts/build-extension.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "test": "vitest run",
+    "test:ui": "vitest",
+    "e2e": "playwright test",
+    "format": "prettier -w ."
+  },
+  "dependencies": {
+    "preact": "10.23.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.6.0",
-    "@commitlint/config-conventional": "^18.6.0",
-    "@eslint/js": "^9.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.3.0",
-    "@typescript-eslint/parser": "^8.3.0",
-    "concurrently": "^8.2.2",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-react": "^7.35.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-simple-import-sort": "^12.1.0",
-    "eslint-plugin-tailwindcss": "^3.15.1",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.3",
-    "prettier": "^3.3.2",
-    "prettier-plugin-tailwindcss": "^0.6.8",
-    "typescript": "^5.4.5"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,md,css,json}": [
-      "pnpm format",
-      "git add"
-    ]
+    "@playwright/test": "1.48.2",
+    "@preact/preset-vite": "2.9.1",
+    "@types/node": "22.7.5",
+    "@types/preact": "10.19.7",
+    "axe-core": "4.10.0",
+    "autoprefixer": "10.4.20",
+    "eslint": "9.11.1",
+    "eslint-plugin-n": "17.10.3",
+    "postcss": "8.4.47",
+    "prettier": "3.3.3",
+    "typescript": "5.6.2",
+    "vite": "5.4.8",
+    "vitest": "2.1.3",
+    "fs-extra": "11.2.0"
   }
 }
