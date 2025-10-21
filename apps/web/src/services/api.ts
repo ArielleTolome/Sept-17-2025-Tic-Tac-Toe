@@ -1,11 +1,11 @@
 import {
-  createRoomResponseSchema,
-  joinRoomResponseSchema,
-  gameStateSchema,
-  leaderboardResponseSchema,
   type CreateRoomResponseDto,
+  createRoomResponseSchema,
   type GameStateDto,
+  gameStateSchema,
   type JoinRoomResponseDto,
+  joinRoomResponseSchema,
+  leaderboardResponseSchema,
 } from '@tic-tac-toe/shared';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';

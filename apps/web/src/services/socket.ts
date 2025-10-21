@@ -1,5 +1,5 @@
-import { io, type Socket } from 'socket.io-client';
 import type { ClientToServerEventMap, ServerToClientEventMap } from '@tic-tac-toe/shared';
+import { io, type Socket } from 'socket.io-client';
 
 type EventArgs<T> = T extends Record<string, never> ? [] : [T];
 type EventHandlerMap<T extends Record<string, unknown>> = {

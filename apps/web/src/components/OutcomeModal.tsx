@@ -1,5 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
+
 import { t } from '../i18n';
 import { Confetti } from './Confetti';
 

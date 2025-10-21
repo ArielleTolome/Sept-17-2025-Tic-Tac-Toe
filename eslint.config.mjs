@@ -32,6 +32,10 @@ export default [
           jsx: true,
         },
       },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
@@ -47,6 +51,7 @@ export default [
         },
       ],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+      'no-undef': 'off', // TypeScript handles this
     },
   },
   {
@@ -77,6 +82,7 @@ export default [
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react/no-unknown-property': ['error', { ignore: ['class'] }],
+      'react/prop-types': 'off', // Using TypeScript for type checking
       'tailwindcss/classnames-order': 'error',
       'tailwindcss/no-custom-classname': 'off',
     },

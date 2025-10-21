@@ -1,10 +1,11 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { GameBoard } from '../components/GameBoard';
 import { MoveHistory } from '../components/MoveHistory';
 import { OutcomeModal } from '../components/OutcomeModal';
-import { Scoreboard } from '../components/Scoreboard';
 import { RecentResults } from '../components/RecentResults';
+import { Scoreboard } from '../components/Scoreboard';
 import { t } from '../i18n';
 import { useLocalGameStore } from '../state/local-game';
 

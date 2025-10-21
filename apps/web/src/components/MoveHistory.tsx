@@ -1,5 +1,6 @@
 import type { MoveRecord, TimeTravelEntry } from '@tic-tac-toe/shared';
 import clsx from 'clsx';
+
 import { t } from '../i18n';
 
 interface MoveHistoryProps {

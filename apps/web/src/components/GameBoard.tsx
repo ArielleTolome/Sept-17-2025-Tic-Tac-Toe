@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
-import clsx from 'clsx';
 import { type Board, type PlayerMark } from '@tic-tac-toe/shared';
-import { t } from '../i18n';
+import clsx from 'clsx';
+import { useMemo } from 'react';
+
 import { useGameboardNavigation } from '../hooks/use-gameboard-navigation';
+import { t } from '../i18n';
 
 interface GameBoardProps {
   board: Board;
@@ -47,7 +48,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               type="button"
               role="gridcell"
               aria-label={label}
-              aria-pressed={!isEmpty}
+              aria-disabled={disabled || !isEmpty}
               disabled={disabled || !isEmpty}
               tabIndex={focusedIndex === index ? 0 : -1}
               onFocus={() => setFocusedIndex(index)}
@@ -66,7 +67,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 }
               }}
               className={clsx(
-                'relative flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white text-4xl font-semibold text-slate-600 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 hover:border-brand-300 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
+                'relative flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white text-4xl font-semibold text-slate-600 transition hover:border-brand-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100',
                 isWinning && 'border-brand-500 bg-brand-100 text-brand-700 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-200',
               )}
             >

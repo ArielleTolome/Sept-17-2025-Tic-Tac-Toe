@@ -1,19 +1,19 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   applyMove,
+  type Board,
   calculateOutcome,
   createEmptyBoard,
-  getOpposingPlayer,
-  type Board,
+  Difficulty,
   type GameOutcome,
+  getOpposingPlayer,
   type MoveRecord,
   type PlayerMark,
   type ScoreboardRecord,
   type StoredLocalResult,
   type TimeTravelEntry,
-  Difficulty,
 } from '@tic-tac-toe/shared';
+import { create } from 'zustand';
+import { createJSONStorage,persist } from 'zustand/middleware';
 
 export type LocalMode = 'single' | 'local';
 

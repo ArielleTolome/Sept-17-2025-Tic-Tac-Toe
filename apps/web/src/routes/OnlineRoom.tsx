@@ -1,14 +1,15 @@
+import { jwtDecode } from 'jwt-decode';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
-import { GameBoard } from '../components/GameBoard';
+
 import { ChatPanel } from '../components/ChatPanel';
+import { GameBoard } from '../components/GameBoard';
 import { OutcomeModal } from '../components/OutcomeModal';
 import { PresencePanel } from '../components/PresencePanel';
 import { RoomLink } from '../components/RoomLink';
 import { TimerBadge } from '../components/TimerBadge';
 import { t } from '../i18n';
-import { useOnlineGameStore, type Seat } from '../state/online-game';
+import { type Seat,useOnlineGameStore } from '../state/online-game';
 import { getRoomToken } from '../utils/storage';
 
 interface TokenPayload {

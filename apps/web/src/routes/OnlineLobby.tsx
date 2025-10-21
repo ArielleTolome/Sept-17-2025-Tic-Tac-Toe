@@ -1,8 +1,10 @@
-import { FormEvent, useMemo, useState } from 'react';
+import type { FormEvent} from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { t } from '../i18n';
-import { usePreferencesStore } from '../state/preferences';
 import { createRoom, joinRoom } from '../services/api';
+import { usePreferencesStore } from '../state/preferences';
 import { clearRoomToken, listRoomTokens, saveRoomToken } from '../utils/storage';
 
 const WS_BASE = import.meta.env.VITE_WS_URL ?? import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000';
@@ -63,7 +65,7 @@ export const OnlineLobby: React.FC = () => {
             type="button"
             onClick={handleCreate}
             disabled={loading === 'create'}
-            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading === 'create' ? '…' : t('home.createRoom')}
           </button>
@@ -81,7 +83,7 @@ export const OnlineLobby: React.FC = () => {
             <button
               type="submit"
               disabled={loading === 'join'}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               {loading === 'join' ? '…' : t('home.join')}
             </button>

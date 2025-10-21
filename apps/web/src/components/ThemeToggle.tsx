@@ -1,13 +1,14 @@
 import { Listbox, Transition } from '@headlessui/react';
 import {
+  CheckIcon,
+  ChevronUpDownIcon,
   ComputerDesktopIcon,
   MoonIcon,
   SunIcon,
-  CheckIcon,
-  ChevronUpDownIcon,
 } from '@heroicons/react/24/outline';
 import { Fragment } from 'react';
-import { useTheme, usePreferencesStore } from '../state/preferences';
+
+import { usePreferencesStore,useTheme } from '../state/preferences';
 
 const themeOptions = [
   { value: 'system', label: 'System', icon: ComputerDesktopIcon },

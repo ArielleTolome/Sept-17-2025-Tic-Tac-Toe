@@ -1,5 +1,6 @@
-import { t } from '../i18n';
 import type { ScoreboardRecord } from '@tic-tac-toe/shared';
+
+import { t } from '../i18n';
 
 interface ScoreboardProps {
   title?: string;

@@ -1,10 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+
 import { Layout } from './components/Layout';
 import { Home } from './routes/Home';
-import { SinglePlayerGame } from './routes/SinglePlayerGame';
 import { LocalMultiplayerGame } from './routes/LocalMultiplayerGame';
 import { OnlineLobby } from './routes/OnlineLobby';
 import { OnlineRoom } from './routes/OnlineRoom';
+import { SinglePlayerGame } from './routes/SinglePlayerGame';
 
 const App: React.FC = () => (
   <Layout>

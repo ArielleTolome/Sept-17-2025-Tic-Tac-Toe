@@ -1,5 +1,7 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
 import type { ChatEventPayload } from '@tic-tac-toe/shared';
+import type { FormEvent} from 'react';
+import { useEffect, useRef, useState } from 'react';
+
 import { t } from '../i18n';
 
 interface ChatPanelProps {

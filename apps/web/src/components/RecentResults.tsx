@@ -1,4 +1,5 @@
 import type { StoredLocalResult } from '@tic-tac-toe/shared';
+
 import { t } from '../i18n';
 
 interface RecentResultsProps {

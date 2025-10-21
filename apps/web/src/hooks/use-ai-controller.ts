@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
 import { Difficulty, getAiMove } from '@tic-tac-toe/shared';
+import { useEffect } from 'react';
+
 import { useLocalGameStore } from '../state/local-game';
 
 export const useAiController = () => {

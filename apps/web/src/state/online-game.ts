@@ -1,13 +1,14 @@
-import { create } from 'zustand';
 import {
-  createEmptyBoard,
   type Board,
+  type ChatEventPayload,
+  createEmptyBoard,
   type MoveRecord,
   type PlayerMark,
   type PlayerSlot,
   type Spectator,
-  type ChatEventPayload,
 } from '@tic-tac-toe/shared';
+import { create } from 'zustand';
+
 import { createGameSocket, type GameSocket } from '../services/socket';
 
 export type Seat = 'X' | 'O' | 'spectator';

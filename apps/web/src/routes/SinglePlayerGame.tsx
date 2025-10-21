@@ -1,6 +1,7 @@
+import type { Difficulty } from '@tic-tac-toe/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Difficulty } from '@tic-tac-toe/shared';
+
 import { GameBoard } from '../components/GameBoard';
 import { MoveHistory } from '../components/MoveHistory';
 import { OutcomeModal } from '../components/OutcomeModal';

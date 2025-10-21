@@ -1,5 +1,6 @@
 import type { PlayerSlot, Spectator } from '@tic-tac-toe/shared';
 import clsx from 'clsx';
+
 import { t } from '../i18n';
 import type { Seat } from '../state/online-game';
 
