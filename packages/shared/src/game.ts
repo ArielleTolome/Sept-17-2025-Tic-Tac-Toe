@@ -1,4 +1,5 @@
 import { BOARD_SIZE, PLAYER_MARKS, WINNING_LINES } from './constants';
+import type { MovePayload } from './schemas';
 import type {
   Board,
   CellValue,
@@ -7,7 +8,6 @@ import type {
   PlayerMark,
   WinningLine,
 } from './types';
-import type { MovePayload } from './schemas';
 
 export const createEmptyBoard = (): CellValue[] => Array<CellValue>(BOARD_SIZE).fill(null);
 
